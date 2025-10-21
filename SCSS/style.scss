@@ -1,0 +1,25 @@
+// using _ we have created a partial file which we can import here through import statement
+@import 'button.scss';
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html, body{
+    height: 100%;
+    width: 100%;
+    background-color: #111;
+}
+h1{
+    color: red;
+}
+
+#blue{
+    //using include, we can use mixin and pass parameters to it
+    @include button-styles(blue, white);
+    margin: 20px;
+}
+#red{
+    @include button-styles(red, white);
+    margin: 20px;
+}

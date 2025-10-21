@@ -1,0 +1,16 @@
+//here mixin works like function and takes parameters, we can set default values to parameters as well
+@mixin button-styles($bg-color:blue , $text-color:white){
+    background-color: $bg-color;
+    color: $text-color;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+
+    &:hover{
+        background-color: darken($bg-color, 10%);
+    }
+}

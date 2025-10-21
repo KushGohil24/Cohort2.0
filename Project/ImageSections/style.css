@@ -1,0 +1,46 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: #111;
+}
+
+main {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+main section {
+  height: 100%;
+  flex-grow: 1;
+  background-size: cover;
+  background-position: center;
+  transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+  cursor: pointer;
+}
+main section:hover {
+  flex-grow: 2;
+}
+main section:nth-child(1) {
+  background-image: url("./images/Image1.jpg");
+}
+main section:nth-child(2) {
+  background-image: url("./images/Image5.jpg");
+}
+main section:nth-child(3) {
+  background-image: url("./images/Image3.jpg");
+}
+main section:nth-child(4) {
+  background-image: url("./images/Image6.jpg");
+}
+main section:nth-child(5) {
+  background-image: url("./images/Image4.jpg");
+}/*# sourceMappingURL=style.css.map */
