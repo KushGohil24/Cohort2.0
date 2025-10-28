@@ -1,9 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
 @font-face {
   font-family: Chillax;
-  src: url(./assets/Chillax_Complete/Fonts/WEB/fonts/Chillax-Regular.woff2)
+  src: url(./assets/Chillax_Complete/Fonts/WEB/fonts/Chillax-Light.woff2)
       format("woff2"),
-    url(./assets/Chillax_Complete/Fonts/WEB/fonts/Chillax-Regular.woff)
+    url(./assets/Chillax_Complete/Fonts/WEB/fonts/Chillax-Light.woff)
       format("woff");
   font-weight: 400;
   font-style: normal;
@@ -172,7 +172,7 @@ main {
     .bottom {
       background-color: #1e1e1e;
       border-radius: 0.7rem;
-      padding: 2rem;
+      padding: 2.2rem;
       @include flex-column(4.5rem);
       p {
         font-size: 1rem;
@@ -186,8 +186,8 @@ main {
           flex-direction: column;
           line-height: 1.2;
           letter-spacing: 0.1rem;
-          font-size: 2.5rem;
-          font-weight: 100;
+          font-size: 3.5rem;
+          font-weight: bold;
           text-transform: uppercase;
         }
         p {
@@ -297,7 +297,9 @@ main {
         h1{
           font-family: 'Chillax', sans-serif;
           text-transform: uppercase;
-          font-size: 2.5rem;
+          font-size: 3.5rem;
+          line-height: 1.1;
+          font-weight: 100;
           font-weight: 100;
         }
       }
@@ -323,7 +325,7 @@ main {
         h2{
           font-family: 'Chillax', sans-serif;
           font-size: 3.5rem;
-          font-weight: 100;
+          font-weight: bold;
           line-height: 1;
           text-transform: uppercase;
         }
@@ -406,19 +408,19 @@ main {
         width: 50%;
       }
       .bottom {
-        padding: 3rem;
+        padding: 3.5rem;
         justify-content: space-between;
         .text {
-          @include flex-column(2rem);
+          @include flex-column(1rem);
           h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
           }
           .paragraphs {
             display: flex;
             justify-content: space-between;
             gap: 2rem;
             p {
-              width: 45%;
+              width: 50%;
               // font-size: 1.1rem;
               font-size: 1.2rem;
               font-weight: 100;
@@ -477,23 +479,3 @@ main {
     }
   }
 }
-/*
-@media (max-width: 1200px) and (min-width: 900px) {
-  main{
-    section{
-      .top {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
-
-        img {
-          width: 100%;
-          min-height: 100%;
-          object-fit: cover;
-          display: block;
-        }
-      }
-    }
-  }
-}
-*/

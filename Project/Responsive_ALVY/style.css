@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
 @font-face {
   font-family: Chillax;
-  src: url(./assets/Chillax_Complete/Fonts/WEB/fonts/Chillax-Regular.woff2) format("woff2"), url(./assets/Chillax_Complete/Fonts/WEB/fonts/Chillax-Regular.woff) format("woff");
+  src: url(./assets/Chillax_Complete/Fonts/WEB/fonts/Chillax-Light.woff2) format("woff2"), url(./assets/Chillax_Complete/Fonts/WEB/fonts/Chillax-Light.woff) format("woff");
   font-weight: 400;
   font-style: normal;
 }
@@ -177,7 +177,7 @@ main section.view3 .top img {
 main section.view3 .bottom {
   background-color: #1e1e1e;
   border-radius: 0.7rem;
-  padding: 2rem;
+  padding: 2.2rem;
   display: flex;
   flex-direction: column;
   gap: 4.5rem;
@@ -197,8 +197,8 @@ main section.view3 .bottom .text h1 {
   flex-direction: column;
   line-height: 1.2;
   letter-spacing: 0.1rem;
-  font-size: 2.5rem;
-  font-weight: 100;
+  font-size: 3.5rem;
+  font-weight: bold;
   text-transform: uppercase;
 }
 main section.view3 .bottom .text p {
@@ -313,7 +313,9 @@ main section.view7 .bottom .up p {
 main section.view7 .bottom .up h1 {
   font-family: "Chillax", sans-serif;
   text-transform: uppercase;
-  font-size: 2.5rem;
+  font-size: 3.5rem;
+  line-height: 1.1;
+  font-weight: 100;
   font-weight: 100;
 }
 main section.view8 {
@@ -343,7 +345,7 @@ main section.view8 .container .top p {
 main section.view8 .container .top h2 {
   font-family: "Chillax", sans-serif;
   font-size: 3.5rem;
-  font-weight: 100;
+  font-weight: bold;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -417,16 +419,16 @@ main .image-noise {
     width: 50%;
   }
   main section.view3 .bottom {
-    padding: 3rem;
+    padding: 3.5rem;
     justify-content: space-between;
   }
   main section.view3 .bottom .text {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
   }
   main section.view3 .bottom .text h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
   }
   main section.view3 .bottom .text .paragraphs {
     display: flex;
@@ -434,7 +436,7 @@ main .image-noise {
     gap: 2rem;
   }
   main section.view3 .bottom .text .paragraphs p {
-    width: 45%;
+    width: 50%;
     font-size: 1.2rem;
     font-weight: 100;
   }
@@ -484,24 +486,4 @@ main .image-noise {
   main section.view8 .container .bottom button {
     padding: 1.2rem 1.5rem;
   }
-}
-/*
-@media (max-width: 1200px) and (min-width: 900px) {
-  main{
-    section{
-      .top {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
-
-        img {
-          width: 100%;
-          min-height: 100%;
-          object-fit: cover;
-          display: block;
-        }
-      }
-    }
-  }
-}
-*//*# sourceMappingURL=style.css.map */
+}/*# sourceMappingURL=style.css.map */
