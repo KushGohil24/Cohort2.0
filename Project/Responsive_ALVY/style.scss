@@ -61,10 +61,13 @@ main {
     padding: 1.1rem;
     .top {
       width: 100%;
+      position: relative;
+      border-radius: 0.7rem;
+      overflow: hidden;
       img {
         width: 100%;
-        border-radius: 0.7rem;
-        filter: contrast(0.92) brightness(0.8);
+        filter: contrast(0.95) brightness(0.8);
+        transform: scale(1.05);
       }
     }
     .bottom {
@@ -153,11 +156,14 @@ main {
     @include flex-column(1rem);
     .top {
       width: 100%;
+      position: relative;
       img {
         width: 100%;
-        border-radius: 0.7rem;
-        filter: contrast(0.92) brightness(0.8);
+        filter: contrast(0.95) brightness(0.8);
+        transform: scale(1.05);
       }
+      border-radius: 0.7rem;
+      overflow: hidden;
     }
     .bottom {
       background-color: #1e1e1e;
@@ -203,6 +209,76 @@ main {
     button{
         display: none;
     }
+  }
+  section.view6{
+    width: 100%;
+    @include flex-column(1rem);
+    padding: 1.1rem;
+    .card:nth-child(1){
+      background-image: url(./assets/img4.webp);
+    }
+    .card:nth-child(2){
+      background-image: url(./assets/img5.webp);
+    }
+    .card:nth-child(3){
+      background-image: url(./assets/img6.webp);
+    }
+    .card{
+      width: 100%;
+      aspect-ratio: 1/1;
+      background-size: cover;
+      border-radius: 0.7rem;
+      padding: 1rem;
+      @include flex-column(1rem);
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      .top{
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        padding: 1.5rem 2rem;
+        .icon{
+          font-size: 1.5rem;
+          padding: 0.3rem 0.5rem;
+          border-radius: 50%;
+          width: fit-content;
+        }
+      }
+      .top .icon, .bottom{
+        background-color: rgba(148, 148, 148, 0.3);
+        backdrop-filter: blur(10px);
+        border: 1px solid #7a7a7aa5;
+      }
+      .bottom{
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-transform: uppercase;
+        h2{
+          font-size: 1.5rem;
+          font-weight: 100;
+        }
+        p{
+          font-family: 'Roboto Mono', sans-serif;
+        }
+      }
+    }
+  }
+  .image-noise {
+        z-index: 2;
+        background-image: url(./assets/img-noise.png);
+         background-position: 0 0;
+        background-size: 200px 200px;
+        width: 100%;
+        position: absolute;
+        top: 0%;
+        bottom: 0%;
+        left: 0%;
+        right: 0%;
+        height: 100%;
   }
 }
 @media (min-width: 900px) {
@@ -298,6 +374,9 @@ main {
           border: 1px solid #6b6b6b5c;
         }
       }
+    }
+    section.view6{
+      flex-direction: row;
     }
   }
 }
