@@ -61,8 +61,11 @@ main section.view1 .top {
 }
 main section.view1 .top img {
   width: 100%;
+  min-height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
   filter: contrast(0.95) brightness(0.8);
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 main section.view1 .bottom {
   background-color: #1e1e1e;
@@ -165,8 +168,11 @@ main section.view3 .top {
 }
 main section.view3 .top img {
   width: 100%;
+  min-height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
   filter: contrast(0.95) brightness(0.8);
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 main section.view3 .bottom {
   background-color: #1e1e1e;
@@ -259,10 +265,11 @@ main section.view6 .card .top .icon {
   width: fit-content;
 }
 main section.view6 .card .top .icon, main section.view6 .card .bottom {
-  background-color: rgba(148, 148, 148, 0.3);
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  background-color: rgba(148, 148, 148, 0.1);
+  -webkit-backdrop-filter: blur(35px);
+          backdrop-filter: blur(35px);
   border: 1px solid rgba(122, 122, 122, 0.6470588235);
+  z-index: 5;
 }
 main section.view6 .card .bottom {
   padding: 1rem 1.5rem;
@@ -278,6 +285,84 @@ main section.view6 .card .bottom h2 {
 }
 main section.view6 .card .bottom p {
   font-family: "Roboto Mono", sans-serif;
+}
+main section.view7 {
+  width: 100%;
+}
+main section.view7 .top img {
+  width: 100%;
+  min-height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  filter: contrast(0.95) brightness(0.8);
+  transform: scale(1.1);
+}
+main section.view7 .bottom .text button span {
+  font-size: 1.3rem;
+  padding: 0.4rem 0.6rem;
+}
+main section.view7 .bottom .up {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+main section.view7 .bottom .up p {
+  font-family: "Roboto Mono", sans-serif;
+  opacity: 0.7;
+}
+main section.view7 .bottom .up h1 {
+  font-family: "Chillax", sans-serif;
+  text-transform: uppercase;
+  font-size: 2.5rem;
+  font-weight: 100;
+}
+main section.view8 {
+  width: 100%;
+  padding: 1.1rem;
+}
+main section.view8 .container {
+  width: 100%;
+  padding: 2.3rem;
+  background-color: #CDBD63;
+  border-radius: 0.7rem;
+  color: #1A1A1A;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+main section.view8 .container .top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+main section.view8 .container .top p {
+  font-family: "Roboto Mono", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.1rem;
+}
+main section.view8 .container .top h2 {
+  font-family: "Chillax", sans-serif;
+  font-size: 3.5rem;
+  font-weight: 100;
+  line-height: 1;
+  text-transform: uppercase;
+}
+main section.view8 .container .bottom button {
+  width: 100%;
+  background-color: #121212;
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  font-weight: 300;
+  letter-spacing: 0.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 main .image-noise {
   z-index: 2;
@@ -374,12 +459,49 @@ main .image-noise {
   }
   main section.view5 button span {
     background-color: #292929;
-    padding: 0.3rem 0.6rem;
+    padding: 0.3rem 0.5rem;
     border-radius: 50%;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 100;
     border: 1px solid rgba(107, 107, 107, 0.3607843137);
   }
   main section.view6 {
     flex-direction: row;
   }
-}/*# sourceMappingURL=style.css.map */
+  main section.view8 .container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 4rem;
+    gap: 0.5rem;
+  }
+  main section.view8 .container .top {
+    width: 75%;
+  }
+  main section.view8 .container .top h2 {
+    font-size: 5.5rem;
+  }
+  main section.view8 .container .bottom button {
+    padding: 1.2rem 1.5rem;
+  }
+}
+/*
+@media (max-width: 1200px) and (min-width: 900px) {
+  main{
+    section{
+      .top {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+
+        img {
+          width: 100%;
+          min-height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+      }
+    }
+  }
+}
+*//*# sourceMappingURL=style.css.map */
