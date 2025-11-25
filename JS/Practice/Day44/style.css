@@ -1,0 +1,37 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html , body{
+    height: 100%;
+    width: 100%;
+}
+body{
+    overflow: hidden;
+}
+main{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+button{
+    padding: 10px 20px;
+    font-size: 26px;
+    cursor: pointer;
+    background-color: coral;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    position: relative;
+    z-index: 7;
+}
+button:hover{
+    background-color: rgb(253, 122, 50);
+}
+h1{
+    color: rgb(25, 25, 25);
+    white-space: nowrap;
+}
