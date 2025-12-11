@@ -163,6 +163,10 @@ function addData(){
                         <h4 class="share-icon icon"><i class="ri-share-forward-line"></i></h4>
                         <h6>${reel.shareCount}</h6>
                     </div>
+
+                    <div class="menu">
+                        <h4 class="menu-icon icon"><i class="ri-more-2-fill"></i></h4>
+                    </div>
                 </div>
 
             </div>

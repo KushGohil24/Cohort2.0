@@ -106,7 +106,7 @@ section{
 
 .right{
     width: 40px;
-    padding: 60px 35px;
+    padding: 100px 35px;
     display: flex;
     flex-direction: column;
     gap: 20px;
