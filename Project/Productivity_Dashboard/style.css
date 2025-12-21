@@ -4,6 +4,9 @@
     --tri1: #feba17;
     --tri2: #74512d;
     --red: red;
+    --green: rgb(9, 138, 89);
+    --blue: rgb(0, 191, 255);
+    --black: black;
 }
 @font-face {
     font-family: aeonik;
@@ -39,7 +42,7 @@ html , body{
 section.allElems{
     height: 100%;
     width: 100%;
-    padding: 40px;
+    padding: 35px;
     padding-top: 80px;
     display: flex;
     flex-wrap: wrap;
@@ -47,8 +50,57 @@ section.allElems{
     gap: 20px;
     position: absolute;
 }
+.allElems header{
+    height: 400px;
+    width: 100%;
+    background: url(./assets/heroimg.png);
+    background-size: cover !important;
+    background-position: center !important;
+    margin-bottom: 30px;
+    border-radius: 20px;
+    padding: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+header .header1 h1{
+    font-size: 100px;
+}
+header .header1 h2{
+    font-size: 50px;
+    font-family: aeonik;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+header .header1 h4{
+    font-size: 80px;
+    font-family: aeonik;
+    font-weight: 500;
+}
+header .header2 h2{
+    font-size: 65px;
+}
+header .header2 h4{
+    font-size: 40px;
+    font-weight: 500;
+    font-family: aeonik;
+    margin-bottom: 10px;
+    margin-top: -10px;
+}
+header .header2 h3{
+    font-size: 25px;
+    font-family: aeonik;
+    font-weight: 500;
+    margin-left: 5px;
+}
+section.allElems .allFeatures{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 20px;
+}
 .elem{
-    background-color: #feba17;
+    background-color: var(--tri1);
     height: 430px;
     width: 350px;
     border-radius: 15px;
@@ -75,7 +127,7 @@ section.allElems{
 .fullElem{
     height: 100%;
     width: 100%;
-    background-color: #381c0a;
+    background-color: var(--sec);
     padding: 40px;
     font-size: 50px;
     display: none;
@@ -199,11 +251,12 @@ section.allElems{
 .task button{
     padding: 15px 30px;
     color: var(--pri);
-    background-color: green;
+    background-color: var(--green);
     font-size: 20px;
     border-radius: 5px;
     border: none;
     font-weight: 600;
+    cursor: pointer;
 }
 .task button:active{
     transform: scale(0.97);
@@ -214,11 +267,9 @@ section.allElems{
     gap: 10px
 }
 .task div i{
-    color: black;
+    color: var(--black);
     transition: all 0.5s ease;
-}
-.todo-list-fullpage{
-    display: block;
+    cursor: pointer;
 }
 .allTask .details{
     background-color: var(--pri);
@@ -236,4 +287,235 @@ section.allElems{
     font-family: aeonik;
     margin: 10px 0px;
     font-weight: 600;
+}
+
+.daily-planner-fullpage h2{
+    font-size: 65px;
+}
+.daily-planner-fullpage .day-start-with{
+    background-color: var(--tri2);
+    display: flex;
+    margin-top: 20px;
+    padding: 15px 25px;
+    border-radius: 10px;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+}
+.daily-planner-fullpage .day-start-with p{
+    font-size: 25px;
+}
+.daily-planner-fullpage .day-start-with .start-hour, .daily-planner-fullpage .day-start-with button{
+    background-color: var(--sec);
+    width: 60px;
+    font-size: 20px;
+    color: var(--pri);
+    border: none;
+    outline: none;
+    padding: 10px 20px;
+    border-radius: 7px;
+}
+.daily-planner-fullpage .day-start-with button{
+    width: fit-content;
+    position: absolute;
+    right: 5%;
+    font-size: 20px;
+    background-color: var(--red);
+}
+.daily-planner-fullpage .day-planner{
+    background-color: var(--tri2);
+    width: 100%;
+    height: 84%;
+    margin-top: 20px;
+    border-radius: 10px;
+    padding: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    overflow: auto;
+}
+.daily-planner-fullpage .day-planner .day-planner-time{
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 49%;
+    margin-bottom: 30px;
+}
+.day-planner .day-planner-time input{
+    padding: 20px 45px;
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: var(--sec);
+    color: var(--pri);
+    font-size: 32px;
+    padding-top: 34px;
+    font-family: aeonik;
+    border-radius: 10px;
+}
+.day-planner .day-planner-time p{
+    position: absolute;
+    top: 10%;
+    left: 2%;
+    font-size: 18px;
+    font-family: aeonik;
+    color: var(--tri1);
+}
+
+
+.motivation-fullPage-container {
+    height: 100%;
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+
+.motivational-fullpage .motivation-container {
+    height: 600px;
+    width: 80%;
+    border-radius: 50px;
+    position: relative;
+}
+
+.motivational-fullpage .motivation-container::after {
+    content: '';
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background-color: var(--tri1);
+    border-radius: 50px;
+    scale: 1.15;
+    -webkit-filter: blur(100px);
+    filter: blur(100px);
+    z-index: 8;
+}
+
+.motivational-fullpage .motivation-container .motivation-wrapper {
+    z-index: 10;
+    position: absolute;
+
+    width: 100%;
+    background-color: var(--tri1);
+    padding: 20px;
+    border-radius: 30px;
+    border: 6px solid var(--tri2);
+
+}
+
+.motivation-1 {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+}
+
+.motivation-1 h2 {
+
+    background-color: var(--tri2);
+    padding: 30px;
+    border-radius: 20px;
+    font-size: 40px;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    font-weight: 500;
+    text-align: right;
+}
+
+.motivation-2 {
+    margin-top: 40px;
+    margin-bottom: 10px;
+    padding: 30px;
+
+}
+
+.motivation-2 h1 {
+    font-size: 65px;
+    font-weight: 700;
+    color: var(--sec);
+
+}
+
+.motivation-3 {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+}
+
+.motivation-3 h2 {
+    /* background-color: var(--tri2); */
+    padding: 30px;
+    border-radius: 20px;
+    font-size: 40px;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    text-align: right;
+    color: var(--sec);
+}
+.motivational-fullpage .motivation-container .motivation-wrapper img {
+    position: absolute;
+    right: 5%;
+    opacity: 0.2;
+    top: 5%;
+    height: 120px;
+}
+
+
+
+.pomodoro-fullpage h2{
+    font-size: 55px
+}
+.pomodoro-fullpage .session{
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    padding: 15px 30px;
+    font-size: 30px;
+    border-radius: 5px;
+    background-color: var(--green);
+}
+.pomodoro-fullpage .pomo-timer{
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.pomo-timer h1{
+    font-size: 170px;
+}
+.pomo-timer button{
+    background-color: var(--tri2);
+    padding: 15px 40px;
+    font-size: 30px;
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+    transition: all ease 0.1s;
+    box-shadow: 5px 5px 5px var(--black);
+}
+.pomo-timer button:active{
+    box-shadow: 0px 0px 0px var(--black);
+    transform: scale(0.97);
 }
