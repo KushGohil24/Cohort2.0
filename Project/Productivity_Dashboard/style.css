@@ -202,6 +202,7 @@ section.allElems .allFeatures {
   font-size: 50px;
   display: none;
   position: absolute;
+  overflow-y: auto;
 }
 .back {
   position: absolute;
@@ -895,7 +896,9 @@ header h3 {
   .fullElem h2 {
     font-size: 32px;
   }
-
+  .pomodoro-fullpage .session{
+    font-size: 20px;
+  }
   .pomo-timer h1 {
     font-size: 78px;
   }
@@ -907,6 +910,7 @@ header h3 {
 
   .daily-goals-container {
     padding: 15px;
+    margin-top: 80px;
   }
 
   .display-goals .goal-container .goal input {
