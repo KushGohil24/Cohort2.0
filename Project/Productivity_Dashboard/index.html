@@ -11,6 +11,12 @@
 <body>
     <div id="main">
         <section class="allElems">
+            <nav>
+                <h2>Productivity Dashboard</h2>
+                <div class="theme">
+                    <h4>Change Theme</h4>
+                </div>
+            </nav>
             <header>
                 <div class="header1">
                     <h2></h2>
@@ -65,13 +71,6 @@
                     </form>
                 </div>
                 <div class="allTask">
-                    <div class="task">
-                            <h5>Have a break at 5pm <span>imp</span></h5>
-                            <div>
-                                <button id="0">Mark as completed</button>
-                                <i class="ri-arrow-down-s-line"></i>
-                            </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -117,9 +116,21 @@
                 <button class="reset-timer">Reset</button>
             </div>
         </section>
-        <section class="fullElem">
+        <section class="fullElem daily-goals-fullpage">
             <button class="back"><i class="ri-close-circle-fill"></i></button>
-            <h1>Daily Goals</h1>
+            <h2>Daily Goals</h2>
+            <div class="daily-goals-container">
+                <div class="add-goals">
+                    <input type="text" placeholder="Enter your today's Goals">
+                    <button class="add-goal">Add</button>
+                    <button class="clear">clear All Goals</button>
+                </div>
+                <div class="display-goals">
+                    <div class="goal-container">
+                        
+                    </div>
+                </div>
+            </div>
         </section>
     </div>
     <script type="module" src="script.js"></script>
