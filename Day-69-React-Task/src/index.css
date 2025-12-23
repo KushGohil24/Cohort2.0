@@ -181,3 +181,151 @@ section .sec1{
   font-size: 25px;
   width: 50%;
 }
+.second-sec{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 60px 30px;
+}
+.second-sec .card{
+  height: 325px;
+  width: 400px;
+  background-color: #0D1A2C;
+  padding: 10px 20px;
+  border-radius: 20px;
+}
+.second-sec .card .first{
+  background: url('https://www.shutterstock.com/image-vector/tennis-field-flat-icon-on-260nw-501860464.jpg');
+  background-position: center 0%;
+  background-size: cover;
+  mix-blend-mode:lighten;
+  height: 80px;
+  width: 80px;
+}
+.second-sec .card .second{
+  font-size: 29px;
+  padding: 0px 15px;
+  color: #5C6A7C;
+  font-weight: 300;
+}
+.second-sec .card .second span{
+  color: whitesmoke;
+}
+.third{
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.third .toggleContainer{
+  height: 28px;
+  width: 60px;
+  background-color: #2DB3FF;
+  border-radius: 15px;
+  padding: 5px 7px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.third .toggleContainer .button{
+  border: 5px solid white;
+  width: 18px;
+  height: 100%;
+  border-radius: 50%;
+}
+.third .mode{
+  color: #5C6A7C;
+  font-size: 18px;
+}
+.card2{
+  background: url('./assets/home-img1.avif');
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: whitesmoke;
+  font-size: 18px;
+}
+.card2 .desc{
+  padding: 10px 25px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #acacac4d;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.second-sec .card3{
+  background-color: #F7F8FC;
+  padding-top: 25px;
+}
+.card3 .proText h3 {
+    font-size: 50px;
+    font-weight: 500;
+}
+.card3 .proText h4 {
+    font-weight: 500;
+    padding: 5px 0px;
+}
+.card3 .proText p {
+    font-weight: 300;
+    line-height: 1.2;
+    color: #5C6A7C;
+}
+.card3 .levels {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.card3 .levels .level {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.card3 .levels .level .points {
+    display: flex;
+    gap: 3px;
+    justify-content: flex-start;
+    width: 50%;
+}
+.card3 .levels .level .point {
+    width: 14px;
+    height: 14px;
+    border-radius: 50px;
+    background-color: #2DB3FE;
+}
+
+.third-sec{
+  padding: 0px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+.third-sec .third-tagline{
+  font-size: 28px;
+  font-weight: 300;
+}
+.third-sec .number-sec{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 35px 70px;
+}
+.third-sec .number-sec .data-container{
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.third-sec .number-sec .data-container h2{
+  font-size: 40px;
+  font-weight: 500;
+}
+.third-sec .number-sec .data-container p{
+  color: #5C6A7C;
+}
