@@ -173,6 +173,34 @@ const App = () => {
             </div>
           </div>
         </div>
+        <hr />
+        <div className="main-sec2">
+          <div className="services">
+            <div className="logo-text">Services</div>
+            <h3 className="services-desc">Explore our full range of coaching. training, and tennis experiences. From first serve to match point - we've got the right program for you.</h3>
+            <div className="button">Explore More <i className="ri-arrow-right-up-long-line"></i></div>
+          </div>
+          <div className="training">
+            <div className="desc-top">Training Programs</div>
+            <div className="bottom">
+              <div className="training-txt">Program designed for all ages and abilities.</div>
+              <button><i className="ri-arrow-right-up-long-line"></i></button>
+            </div>
+          </div>
+          <div className="court-access">
+            <div className="wrapper">
+              <div className="access-top">Court Access</div>
+              <div className="access-bottom">Hourly Court Rental</div>
+            </div>
+            <div className="bottom">
+              <div className="access-text">Step into a space built for players - to grow, complete, and thrive</div>
+              <div className="access-btn">
+                <i class="ri-arrow-left-long-line"></i>
+                <i class="ri-arrow-right-long-line"></i>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );

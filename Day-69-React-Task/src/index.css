@@ -94,7 +94,7 @@ nav .nav3 button{
   font-size: 18px;
   font-weight: 300;
 }
-.hero .hero-main1 button{
+.hero .hero-main1 button, .main-sec2 .services .button, .main-sec2 .training button{
   background-color: #0D1A2D;
   padding: 10px 20px;
   border: none;
@@ -168,7 +168,7 @@ section .sec1{
   align-items: flex-start;
   justify-content: space-between;
 }
-.first-sec .about{
+.first-sec .about, .main-sec2 .services .logo-text{
   padding: 5px 10px;
   border-radius: 15px;
   color: black;
@@ -188,7 +188,7 @@ section .sec1{
   flex-wrap: wrap;
   padding: 60px 30px;
 }
-.second-sec .card{
+.second-sec .card, .main-sec2 .training, .main-sec2  .wrapper{
   height: 325px;
   width: 400px;
   background-color: #0D1A2C;
@@ -248,7 +248,7 @@ section .sec1{
   color: whitesmoke;
   font-size: 18px;
 }
-.card2 .desc{
+.card2 .desc, .main-sec2 .training .desc-top, .main-sec2 .court-access .wrapper .access-top{
   padding: 10px 25px;
   border-radius: 20px;
   overflow: hidden;
@@ -329,3 +329,92 @@ section .sec1{
 .third-sec .number-sec .data-container p{
   color: #5C6A7C;
 }
+.main-sec2{
+  height: 60vh;
+  width: 100%;
+  padding: 60px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.main-sec2 .services{
+  width: 35%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.services .services-desc{
+  font-size: 28px;
+  font-weight: 400;
+  margin-top: -45px;
+}
+ .main-sec2 .services .button{
+  width: fit-content;
+  margin: 0px;
+ }
+ .main-sec2 .training{
+  background: url('./assets/home-img2.avif');
+  object-fit: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+ }
+
+ .main-sec2 .training .desc-top, .main-sec2 .court-access .wrapper .access-top{
+  color: whitesmoke;
+  width: fit-content;
+ }
+ .main-sec2 .training .bottom{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+ }
+ .main-sec2 .training .bottom .training-txt{
+  color: whitesmoke;
+  font-size: 18px;
+  width: 50%;
+  padding: 20px 0px;
+ }
+ .main-sec2 .training button{
+  padding: 4px;
+  font-size: 24px;
+  margin-top: 10px;
+ }
+ .main-sec2 .court-access {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 325px;
+ }
+ .main-sec2 .court-access .wrapper{
+  height: 200px;
+  background: url('./assets/home-img3.avif');
+   object-fit: cover;
+  background-position: 60% 62%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 25px 20px;
+ }
+ .main-sec2 .court-access .wrapper .access-bottom{
+  font-size: 18px;
+  color: whitesmoke;
+ }
+ .main-sec2 .court-access .bottom{
+  width: 60%;
+  font-size: 20px;
+ }
+ .main-sec2 .court-access .bottom .access-btn{
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+ }
+ .main-sec2 .court-access .bottom .access-btn i{
+  border: 1px solid #acacac4d;
+  padding: 5px 5px;
+  border-radius: 50%;
+ }
