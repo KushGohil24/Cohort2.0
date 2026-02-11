@@ -1,31 +1,111 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-html , body, #root{
-    height: 100%;
-    width: 100%;
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
 }
-html{
+html {
   background-color: #0f0f0f;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
   color: whitesmoke;
 }
-.notes{
+.notes {
   display: flex;
   gap: 1rem;
   padding-block: 1rem;
   padding-inline: 3rem;
   flex-wrap: wrap;
 }
-.note{
+.note {
   background-color: rgb(100, 100, 100);
   padding: 1rem;
   border-radius: 0.7rem;
   max-width: 20rem;
   display: flex;
   flex-direction: column;
-  gap: 5px;
   color: rgb(254, 246, 231);
+  /* position: relative; */
+  /* padding-top: 2rem; */
+  display: flex;
+  flex-direction: row;
+  max-height: 15rem;
+}
+.note .btns{
+  display: flex;
+  flex-direction: column;
+}
+.note button {
+  background-color: transparent;
+  font-weight: bolder;
+  border: none;
+  cursor: pointer;
+  height: 2rem;
+  width: 2rem;
+  position: relative;
+  top: -15px;
+  right: -15px;
+  margin: 5px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+.note .delete-btn{
+  color: rgb(252, 31, 31);
+}
+.note .edit-btn{
+  color: whitesmoke;
+}
+.note button:active {
+  scale: 0.92;
+}
+.note .inner p{
+  height: 80%;
+  overflow: auto;
+}
+.note-form {
+  display: flex;
+  gap: 10px;
+  padding-block: 1rem;
+  padding-inline: 3rem;
+  flex-wrap: wrap;
+}
+.note-form input {
+  font-size: 1rem;
+  padding: 5px 15px;
+  background-color: #414141;
+  color: white;
+  outline: none;
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  border-radius: 5px;
+}
+.note-form button {
+  padding: 10px 15px;
+  font-weight: 500;
+  background-color: #50c878;
+  color: whitesmoke;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s ease;
+}
+.note-form button:active {
+  scale: 0.95;
 }
