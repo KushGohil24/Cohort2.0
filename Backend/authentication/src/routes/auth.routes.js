@@ -46,7 +46,7 @@ authRouter.get("/get-me", async (req, res) => {
 
 authRouter.post("/login", async (req, res) => {
     const {email, password} = req.body;
-    const user = userModel.findOne({email});
+    const user = await userModel.findOne({email});
     if(!user){
         return res.status(404).json({
             message: "User not found"
