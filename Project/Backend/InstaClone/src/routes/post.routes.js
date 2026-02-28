@@ -1,0 +1,8 @@
+const express = require("express");
+const postController = require("../controllers/post.controller");
+const postRouter = express.Router();
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
+postRouter.post("/", upload.single("hello"), postController.createPostController);
+
+module.exports = postRouter;
