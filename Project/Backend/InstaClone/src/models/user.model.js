@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     bio: String,
     profileImage: {
         type: String,
-        default: "https://ik.imagekit.io/9fnunjs8l/InstaClone/default-avatar.jpeg"
+        default: "https://ik.imagekit.io/9fnunjs8l/cohort-2-instaClone-posts/default-avatar.webp"
     }
 })
 
