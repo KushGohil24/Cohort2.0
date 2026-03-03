@@ -30,10 +30,11 @@ async function followUserController(req, res){
     }
     const followRecord = await followModel.create({
         follower: followerUsername,
-        followee: followeeUsername
+        followee: followeeUsername,
+        status: "pending"
     })
     res.status(201).json({
-        message: `You are now following ${followeeUsername}`,
+        message: `Follow request sent to ${followeeUsername}`,
         follow: followRecord
     })
 }
@@ -73,7 +74,54 @@ async function unfollowUserController(req, res){
         unfollow
     })
 }
+
+async function acceptFollowRequestController(req, res){
+    const followerUsername = req.user.username;
+    const  followeeUsername = req.params.username;
+    const followRecord = await followModel.findOne({
+        follower: followerUsername,
+        followee: followeeUsername,
+        status: "pending"
+    })
+    if(!followRecord){
+        return res.status(404).json({
+            message: "Follow request not found"
+        })
+    }
+    const updatedFollowRecord = await followModel.findByIdAndUpdate(followRecord._id, {
+        status: "accepted"
+    }, { new: true })
+    res.status(200).json({
+        message: "Follow request accepted",
+        updatedFollowRecord
+    })
+}
+
+async function rejectFollowRequestController(req, res){
+    const followerUsername = req.user.username;
+    const followeeUsername = req.params.username;
+    const followRecord = await followModel.findOne({
+        follower: followerUsername,
+        followee: followeeUsername,
+        status: "pending"
+    })
+    if(!followRecord){
+        return res.status(404).json({
+            message: "Follow request not found"
+        })
+    }
+    const updatedFollowRecord = await followModel.findByIdAndUpdate(followRecord._id, {
+        status: "rejected"
+    }, { new: true })
+    res.status(200).json({
+        message: "Follow request rejected",
+        updatedFollowRecord
+    })
+}
+
 module.exports = {
     followUserController,
-    unfollowUserController
+    unfollowUserController,
+    acceptFollowRequestController,
+    rejectFollowRequestController
 }
