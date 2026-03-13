@@ -15,7 +15,11 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, "Password is required"],
         select: false
-    }
+    },
+    likedSongs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'songs'
+    }]
 })
 
 const userModel = mongoose.model("users", userSchema);

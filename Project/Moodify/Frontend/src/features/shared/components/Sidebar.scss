@@ -1,0 +1,150 @@
+.aura-sidebar {
+    padding: 24px 20px 114px 20px; /* 114px = 24px original + 90px player gap */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 40px;
+        padding-left: 8px;
+
+        .brand-logo {
+            background: linear-gradient(135deg, #a78bfa 0%, var(--accent-primary) 100%);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+    }
+
+    .sidebar-section {
+        margin-bottom: 32px;
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 1.2px;
+            margin-bottom: 16px;
+            padding-left: 12px;
+        }
+
+        .mood-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .mood-btn {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px;
+                border-radius: 12px;
+                color: var(--text-secondary);
+                font-size: 15px;
+                transition: all 0.2s ease;
+                border: 1px solid transparent;
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.04);
+                    color: var(--text-primary);
+                }
+
+                &.active {
+                    background-color: var(--bg-elevated);
+                    color: #fbbf24; /* yellow-ish text for active like image */
+                    border: 1px solid rgba(251, 191, 36, 0.2);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                }
+
+                .mood-icon {
+                    font-size: 18px;
+                    filter: grayscale(1);
+                    opacity: 0.7;
+                }
+
+                &.active .mood-icon {
+                    filter: grayscale(0);
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    .nav-section {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .nav-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+
+            &:hover {
+                color: var(--text-primary);
+            }
+
+            &.active {
+                color: var(--text-primary);
+                background-color: rgba(255, 255, 255, 0.04);
+            }
+        }
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        
+        .recalibrate-card {
+            background-color: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+
+            p {
+                color: var(--text-secondary);
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+
+            .recalibrate-btn {
+                background-color: var(--accent-primary);
+                color: white;
+                width: 100%;
+                padding: 10px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                transition: background-color 0.2s;
+
+                &:hover {
+                    background-color: var(--accent-hover);
+                }
+            }
+        }
+    }
+}

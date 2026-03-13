@@ -1,281 +1,273 @@
-import React, { useRef, useState, useEffect } from 'react'
-import { getSong } from '../../home/services/song.api'
-import './MusicPlayer.scss'
-
-const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2]
+import React, { useRef, useState, useEffect } from 'react';
+import { toggleLike } from '../../home/services/song.api';
+import './MusicPlayer.scss';
 
 const formatTime = (seconds) => {
-    if (isNaN(seconds)) return '0:00'
-    const m = Math.floor(seconds / 60)
-    const s = Math.floor(seconds % 60).toString().padStart(2, '0')
-    return `${m}:${s}`
-}
+    if (isNaN(seconds)) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+};
 
-const MusicPlayer = ({ mood }) => {
-    const audioRef = useRef(null)
-    const progressRef = useRef(null)
+const MusicPlayer = ({ 
+    song, 
+    onNext, 
+    onPrev, 
+    isEdgeLightEnabled, 
+    onToggleEdgeLight, 
+    audioRef,
+    likedSongs = [],
+    onLikeToggle
+}) => {
+    const progressRef = useRef(null);
+    const fallbackAudioRef = useRef(null);
+    const activeAudioRef = audioRef || fallbackAudioRef;
 
-    const [isPlaying, setIsPlaying] = useState(false)
-    const [currentTime, setCurrentTime] = useState(0)
-    const [duration, setDuration] = useState(0)
-    const [speed, setSpeed] = useState(1)
-    const [volume, setVolume] = useState(1)
-    const [showSpeed, setShowSpeed] = useState(false)
-    const [isMuted, setIsMuted] = useState(false)
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [volume, setVolume] = useState(1);
+    const [isMuted, setIsMuted] = useState(false);
+    const [isLooping, setIsLooping] = useState(false);
+    const [isShuffling, setIsShuffling] = useState(false);
 
-    const [song, setSongData] = useState(null)
-    
-    // Fetch song when mood changes
     useEffect(() => {
-        if (!mood) return;
-        const fetchSong = async () => {
-            try {
-                const data = await getSong({ mood: mood.toLowerCase() });
-                if (data?.song) {
-                    setSongData(data.song);
-                    setIsPlaying(false);
-                    setCurrentTime(0);
-                } else {
-                    setSongData(null);
-                }
-            } catch (err) {
-                console.error("Failed to fetch song", err);
-                setSongData(null);
+        if (activeAudioRef.current && song?.url) {
+            activeAudioRef.current.load();
+            setCurrentTime(0);
+            
+            const playPromise = activeAudioRef.current.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    setIsPlaying(true);
+                }).catch(e => {
+                    console.log("Auto-play prevented", e);
+                    setIsPlaying(false); // Fix: Revert to play button if blocked
+                });
+            } else {
+                setIsPlaying(true); // Fallback for browsers that don't return promise
             }
-        };
-        fetchSong();
-    }, [mood]);
-
-    // Reset player when song changes
-    useEffect(() => {
-        if (audioRef.current) {
-            audioRef.current.load()
-            setIsPlaying(false)
-            setCurrentTime(0)
         }
-    }, [song?.url])
+    }, [song, activeAudioRef]);
 
-    // Apply speed and volume changes based on state
     useEffect(() => {
-        if (audioRef.current) {
-            audioRef.current.playbackRate = speed;
-            audioRef.current.volume = isMuted ? 0 : volume;
-            audioRef.current.muted = isMuted;
+        if (activeAudioRef.current) {
+            activeAudioRef.current.volume = isMuted ? 0 : volume;
+            activeAudioRef.current.muted = isMuted;
+            activeAudioRef.current.loop = isLooping;
         }
-    }, [speed, volume, isMuted]);
+    }, [volume, isMuted, isLooping, activeAudioRef]);
 
     const togglePlay = () => {
-        const audio = audioRef.current
-        if (!audio || !song) return
+        const audio = activeAudioRef.current;
+        if (!audio || !song) return;
         if (isPlaying) {
-            audio.pause()
+            audio.pause();
         } else {
-            audio.play()
+            audio.play();
         }
-        setIsPlaying(!isPlaying)
-    }
-
-    const skip = (secs) => {
-        const audio = audioRef.current
-        if (!audio || !song) return
-        audio.currentTime = Math.min(Math.max(audio.currentTime + secs, 0), duration)
-    }
+        setIsPlaying(!isPlaying);
+    };
 
     const handleTimeUpdate = () => {
-        if(audioRef.current){
-           setCurrentTime(audioRef.current.currentTime)
+        if (activeAudioRef.current) {
+            setCurrentTime(activeAudioRef.current.currentTime);
         }
-    }
+    };
 
     const handleLoadedMetadata = () => {
-        if(audioRef.current){
-           setDuration(audioRef.current.duration)
+        if (activeAudioRef.current) {
+            setDuration(activeAudioRef.current.duration);
         }
-    }
+    };
 
     const handleProgressClick = (e) => {
-        if (!song || !duration) return
-        const bar = progressRef.current
-        const rect = bar.getBoundingClientRect()
-        const ratio = (e.clientX - rect.left) / rect.width
-        const newTime = ratio * duration
-        if(audioRef.current){
-            audioRef.current.currentTime = newTime
+        if (!song || !duration) return;
+        const bar = progressRef.current;
+        const rect = bar.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        const newTime = ratio * duration;
+        if (activeAudioRef.current) {
+            activeAudioRef.current.currentTime = newTime;
         }
-        setCurrentTime(newTime)
-    }
-
-    const handleSpeedChange = (s) => {
-        setSpeed(s)
-        if(audioRef.current){
-            audioRef.current.playbackRate = s
-        }
-        setShowSpeed(false)
-    }
+        setCurrentTime(newTime);
+    };
 
     const handleVolume = (e) => {
-        const val = parseFloat(e.target.value)
-        setVolume(val)
-        if(audioRef.current){
-            audioRef.current.volume = val
+        const val = parseFloat(e.target.value);
+        setVolume(val);
+        if (activeAudioRef.current) {
+            activeAudioRef.current.volume = val;
         }
-        setIsMuted(val === 0)
-    }
+        setIsMuted(val === 0);
+    };
 
     const toggleMute = () => {
-        const audio = audioRef.current
-        if(!audio) return
+        const audio = activeAudioRef.current;
+        if (!audio) return;
         if (isMuted) {
-            const newVol = volume || 0.5
-            audio.volume = newVol
-            setVolume(newVol)
-            setIsMuted(false)
+            const newVol = volume || 0.5;
+            audio.volume = newVol;
+            setVolume(newVol);
+            setIsMuted(false);
         } else {
-            audio.volume = 0
-            setIsMuted(true)
+            audio.volume = 0;
+            setIsMuted(true);
         }
-    }
+    };
 
     const handleSongEnd = () => {
-        setIsPlaying(false)
-        setCurrentTime(0)
-    }
+        // If looping, the audio element handles it natively because we set `loop={true}`.
+        // It won't fire the `onEnded` event if looping.
+        setIsPlaying(false);
+        setCurrentTime(0);
 
-    const progress = duration ? (currentTime / duration) * 100 : 0
+        if (onNext) {
+            onNext(isShuffling); 
+        }
+    };
 
-    if (!song) return (
-        <div className="player">
-             <div className="player__info">
-                <div className="player__meta">
-                    <p className="player__title">No song detected</p>
-                    <span className="player__mood">{mood || "Unknown"}</span>
-                </div>
-            </div>
-        </div>
-    )
+    const handleLikeClick = async () => {
+        if (!song) return;
+        try {
+            const data = await toggleLike(song._id);
+            if (onLikeToggle) {
+                onLikeToggle(data.likedSongs);
+            }
+        } catch (error) {
+            console.error("Failed to toggle like", error);
+        }
+    };
+
+    const progress = duration ? (currentTime / duration) * 100 : 0;
+    const isLiked = song ? likedSongs.includes(song._id) : false;
 
     return (
-        <div className="player">
-            <audio
-                ref={audioRef}
-                src={song.url}
-                onTimeUpdate={handleTimeUpdate}
-                onLoadedMetadata={handleLoadedMetadata}
-                onEnded={handleSongEnd}
-            />
-
-            {/* Poster + Info */}
-            <div className="player__info">
-                <img
-                    className="player__poster"
-                    src={song.posterUrl}
-                    alt={song.title}
+        <div className="aura-music-player">
+            {song && (
+                <audio
+                    ref={activeAudioRef}
+                    src={song.url}
+                    onTimeUpdate={handleTimeUpdate}
+                    onLoadedMetadata={handleLoadedMetadata}
+                    onEnded={handleSongEnd}
+                    crossOrigin="anonymous"
                 />
-                <div className="player__meta">
-                    <p className="player__title">{song.title}</p>
-                    <span className="player__mood">{song.mood}</span>
-                </div>
-            </div>
+            )}
 
-            {/* Progress bar */}
-            <div className="player__progress-wrap">
-                <span className="player__time">{formatTime(currentTime)}</span>
-                <div
-                    className="player__progress"
-                    ref={progressRef}
-                    onClick={handleProgressClick}
-                >
-                    <div className="player__progress-fill" style={{ width: `${progress}%` }} />
-                    <div className="player__progress-thumb" style={{ left: `${progress}%` }} />
-                </div>
-                <span className="player__time">{formatTime(duration)}</span>
-            </div>
-
-            {/* Controls */}
-            <div className="player__controls">
-
-                {/* Speed picker */}
-                <div className="player__speed-wrap">
-                    <button
-                        className="player__btn player__btn--speed"
-                        onClick={() => setShowSpeed(!showSpeed)}
-                        title="Playback speed"
-                    >
-                        {speed}×
-                    </button>
-                    {showSpeed && (
-                        <div className="player__speed-menu">
-                            {SPEED_OPTIONS.map((s) => (
-                                <button
-                                    key={s}
-                                    className={`player__speed-option ${s === speed ? 'active' : ''}`}
-                                    onClick={() => handleSpeedChange(s)}
+            {/* Left Section: Info */}
+            <div className="player-left">
+                {song ? (
+                    <>
+                        <img className="player-poster" src={song.posterUrl} alt={song.title} />
+                        <div className="player-meta">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                <p className="player-title" style={{ marginBottom: 0 }}>{song.title}</p>
+                                <button 
+                                    className={`like-btn ${isLiked ? 'liked' : ''}`} 
+                                    onClick={handleLikeClick}
+                                    style={{ 
+                                        color: isLiked ? '#ec4899' : 'var(--text-secondary)', 
+                                        background: 'transparent', 
+                                        border: 'none', 
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}
                                 >
-                                    {s}×
+                                    <i className={isLiked ? "ri-heart-3-fill" : "ri-heart-3-line"} style={{ fontSize: '16px' }}></i>
                                 </button>
-                            ))}
+                            </div>
+                            <span className="player-artist">Artist Name</span>
+                            <span className="player-mood-badge">{song.mood}</span>
                         </div>
-                    )}
-                </div>
+                    </>
+                ) : (
+                     <div className="player-meta">
+                        <p className="player-title" style={{color: 'var(--text-muted)'}}>No song selected</p>
+                    </div>
+                )}
+            </div>
 
-                {/* Backward 5s */}
-                <button className="player__btn player__btn--skip" onClick={() => skip(-5)} title="Back 5s">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-                        <path d="M1 4v6h6"/>
-                        <path d="M3.51 15a9 9 0 1 0 .49-3.6"/>
-                    </svg>
-                    <span>5s</span>
-                </button>
-
-                {/* Play / Pause */}
-                <button className="player__btn player__btn--play" onClick={togglePlay} title={isPlaying ? 'Pause' : 'Play'}>
-                    {isPlaying ? (
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                            <rect x="6" y="4" width="4" height="16" rx="1"/>
-                            <rect x="14" y="4" width="4" height="16" rx="1"/>
-                        </svg>
-                    ) : (
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                            <path d="M8 5.14v14l11-7-11-7z"/>
-                        </svg>
-                    )}
-                </button>
-
-                {/* Forward 5s */}
-                <button className="player__btn player__btn--skip" onClick={() => skip(5)} title="Forward 5s">
-                    <span>5s</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-                        <path d="M23 4v6h-6"/>
-                        <path d="M20.49 15a9 9 0 1 1-.49-3.6"/>
-                    </svg>
-                </button>
-
-                {/* Volume */}
-                <div className="player__volume">
-                    <button className="player__btn player__btn--vol" onClick={toggleMute} title="Mute">
-                        {isMuted || volume === 0 ? (
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                <path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.87 8.87 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06A8.99 8.99 0 0 0 17.73 18L19 19.27 20.27 18 5.27 3 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-                            </svg>
+            {/* Center Section: Controls & Progress */}
+            <div className="player-center">
+                <div className="player-controls-main">
+                    <button 
+                        className={`ctrl-btn shuffle ${isShuffling ? 'active' : ''}`} 
+                        onClick={() => setIsShuffling(!isShuffling)}
+                        title="Shuffle"
+                        style={{ color: isShuffling ? 'var(--accent-primary)' : '' }}
+                    >
+                        <i className="ri-shuffle-line" style={{ fontSize: '20px' }}></i>
+                    </button>
+                    <button className="ctrl-btn skip-prev" onClick={onPrev} title="Previous">
+                        <i className="ri-skip-back-fill" style={{ fontSize: '24px' }}></i>
+                    </button>
+                    <button className="ctrl-btn play-pause" onClick={togglePlay} title={isPlaying ? 'Pause' : 'Play'}>
+                        {isPlaying ? (
+                            <i className="ri-pause-circle-fill" style={{ fontSize: '36px' }}></i>
                         ) : (
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                            </svg>
+                            <i className="ri-play-circle-fill" style={{ fontSize: '36px' }}></i>
                         )}
                     </button>
-                    <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.05"
-                        value={isMuted ? 0 : volume}
-                        onChange={handleVolume}
-                        className="player__volume-slider"
-                    />
+                    <button className="ctrl-btn skip-next" onClick={() => onNext && onNext(isShuffling)} title="Next">
+                        <i className="ri-skip-forward-fill" style={{ fontSize: '24px' }}></i>
+                    </button>
+                    <button 
+                        className={`ctrl-btn repeat ${isLooping ? 'active' : ''}`} 
+                        onClick={() => setIsLooping(!isLooping)}
+                        title="Repeat"
+                        style={{ color: isLooping ? 'var(--accent-primary)' : '' }}
+                    >
+                        <i className="ri-repeat-2-line" style={{ fontSize: '20px' }}></i>
+                    </button>
+                </div>
+                
+                <div className="player-progress-container">
+                    <span className="time">{formatTime(currentTime)}</span>
+                    <div 
+                        className="progress-bar-wrap"
+                        ref={progressRef}
+                        onClick={handleProgressClick}
+                    >
+                        <div className="progress-bar-bg"></div>
+                        <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+                        <div className="progress-bar-thumb" style={{ left: `${progress}%` }}></div>
+                    </div>
+                    <span className="time">{formatTime(duration)}</span>
                 </div>
             </div>
-        </div>
-    )
-}
 
-export default MusicPlayer
+            {/* Right Section: Volume & Effects */}
+            <div className="player-right">
+                <button 
+                    className={`edge-light-toggle ${isEdgeLightEnabled ? 'active' : ''}`} 
+                    onClick={onToggleEdgeLight}
+                    title="Toggle Edge Light Visualizer"
+                >
+                    <i className="ri-pulse-line" style={{ fontSize: '20px' }}></i>
+                </button>
+                <button className="ctrl-btn volume-btn" onClick={toggleMute} title="Mute">
+                    {isMuted || volume === 0 ? (
+                        <i className="ri-volume-mute-fill" style={{ fontSize: '20px' }}></i>
+                    ) : (
+                        <i className="ri-volume-up-fill" style={{ fontSize: '20px' }}></i>
+                    )}
+                </button>
+                <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolume}
+                    className="volume-slider"
+                />
+            </div>
+        </div>
+    );
+};
+
+export default MusicPlayer;
