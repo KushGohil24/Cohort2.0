@@ -48,20 +48,26 @@ export const detect = ({ landmarkerRef, videoRef, setExpression }) => {
         const frownLeft = getScore("mouthFrownLeft");
         const frownRight = getScore("mouthFrownRight");
 
-        console.log(getScore("mouthFrownLeft"))
+        let currentExpression = "relaxed"; // Default to calm/relaxed
 
-        let currentExpression = "Neutral";
+        // Average the smile and frown scores to account for asymmetry
+        const avgSmile = (smileLeft + smileRight) / 2;
+        const avgFrown = (frownLeft + frownRight) / 2;
 
-        if (smileLeft > 0.5 && smileRight > 0.5) {
-            currentExpression = "happy";
-        } else if (jawOpen > 0.2 && browUp > 0.2) {
-            currentExpression = "surprised";
-        } else if (frownLeft > 0.0001 && frownRight > 0.0001) {
-            currentExpression = "sad";
+        if (avgSmile > 0.6 || (avgSmile > 0.3 && jawOpen > 0.15)) {
+            currentExpression = "energetic"; // Very big smile or moderate smile with open mouth
+        } else if (avgSmile > 0.15) {
+            currentExpression = "happy"; // Even a slight smile
+        } else if (jawOpen > 0.1 && browUp > 0.1) {
+            currentExpression = "energetic"; // "Surprised/Pumped" look
+        } else if (avgFrown > 0.015 || (frownLeft > 0.01 || frownRight > 0.01)) {
+            currentExpression = "sad"; // Slight frown, easily triggered
+        } else {
+            currentExpression = "relaxed"; // Neutral face -> Relaxed
         }
 
         setExpression(currentExpression);
 
-        return currentExpression
+        return currentExpression;
     }
 };

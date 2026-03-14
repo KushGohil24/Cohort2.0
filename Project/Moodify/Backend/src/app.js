@@ -14,9 +14,20 @@ app.use(cors({
 /**
  * Routes
  */
-const authRoutes = require("./routes/auth.routes")
-const songRoutes = require("./routes/song.routes")
-app.use("/api/auth", authRoutes)
-app.use("/api/songs", songRoutes)
+const authRoutes = require("./routes/auth.routes");
+const songRoutes = require("./routes/song.routes");
+const path = require("path");
 
-module.exports = app
+app.use("/api/auth", authRoutes);
+app.use("/api/songs", songRoutes);
+
+// --- DEPLOYMENT FRONTEND SETUP ---
+// 1. Serve static files from the 'dist' folder (which you will move into Backend/src)
+app.use(express.static(path.join(__dirname, "dist")));
+
+// 2. Catch-all route to serve index.html for React Router (must be after API routes)
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
+module.exports = app;

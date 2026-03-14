@@ -9,6 +9,18 @@ const formatTime = (seconds) => {
     return `${m}:${s}`;
 };
 
+const parseSongTitle = (fullTitle) => {
+    if (!fullTitle) return { title: 'Unknown', from: 'Unknown' };
+    const match = fullTitle.match(/(.*?)\s*(?:-?\s*\(?\[?\bfrom\b\s*([^)|\]]*))/i);
+    if (match) {
+        return {
+            title: match[1].trim() || fullTitle,
+            from: match[2] ? match[2].trim() : 'Unknown'
+        };
+    }
+    return { title: fullTitle, from: 'Unknown' };
+};
+
 const MusicPlayer = ({ 
     song, 
     onNext, 
@@ -142,6 +154,7 @@ const MusicPlayer = ({
 
     const progress = duration ? (currentTime / duration) * 100 : 0;
     const isLiked = song ? likedSongs.includes(song._id) : false;
+    const parsedSong = song ? parseSongTitle(song.title) : null;
 
     return (
         <div className="aura-music-player">
@@ -160,10 +173,10 @@ const MusicPlayer = ({
             <div className="player-left">
                 {song ? (
                     <>
-                        <img className="player-poster" src={song.posterUrl} alt={song.title} />
+                        <img className="player-poster" src={song.posterUrl} alt={parsedSong.title} />
                         <div className="player-meta">
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                <p className="player-title" style={{ marginBottom: 0 }}>{song.title}</p>
+                                <p className="player-title" style={{ marginBottom: 0 }}>{parsedSong.title}</p>
                                 <button 
                                     className={`like-btn ${isLiked ? 'liked' : ''}`} 
                                     onClick={handleLikeClick}
@@ -180,7 +193,7 @@ const MusicPlayer = ({
                                     <i className={isLiked ? "ri-heart-3-fill" : "ri-heart-3-line"} style={{ fontSize: '16px' }}></i>
                                 </button>
                             </div>
-                            <span className="player-artist">Artist Name</span>
+                            <span className="player-artist">{parsedSong.from !== 'Unknown' ? `From: ${parsedSong.from}` : 'Unknown'}</span>
                             <span className="player-mood-badge">{song.mood}</span>
                         </div>
                     </>
