@@ -22,12 +22,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/songs", songRoutes);
 
 // --- DEPLOYMENT FRONTEND SETUP ---
-// 1. Serve static files from the 'dist' folder (which you will move into Backend/src)
-app.use(express.static(path.join(__dirname, "dist")));
+// 1. Serve static files from the 'dist' folder (which you will move into Backend/dist)
+app.use(express.static(path.join(__dirname, "../dist")));
 
 // 2. Catch-all route to serve index.html for React Router (must be after API routes)
 app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(__dirname, "dist", "index.html"));
+    res.sendFile(path.join(__dirname, "../dist", "index.html"));
 });
 
 module.exports = app;
