@@ -7,9 +7,9 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://cohort2-0-if2lzpwzr-kush-gohils-projects.vercel.app"],
     credentials: true
-}))
+}));
 
 /**
  * Routes
