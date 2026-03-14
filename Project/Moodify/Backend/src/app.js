@@ -26,7 +26,7 @@ app.use("/api/songs", songRoutes);
 app.use(express.static(path.join(__dirname, "../dist")));
 
 // 2. Catch-all route to serve index.html for React Router (must be after API routes)
-app.get(/.*/, (req, res) => {
+app.use((req, res) => {
     res.sendFile(path.join(__dirname, "../dist", "index.html"));
 });
 
