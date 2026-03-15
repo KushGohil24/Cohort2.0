@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import "../style/register.scss"
 import FormGroup from '../components/FormGroup.jsx'
 import { Link } from 'react-router'
@@ -13,7 +13,13 @@ const Register = () => {
 
     const navigate = useNavigate()
 
-    const { loading, handleRegister } = useAuth()
+    const { user, loading, handleRegister } = useAuth()
+
+    useEffect(() => {
+        if (!loading && user) {
+            navigate("/")
+        }
+    }, [user, loading, navigate])
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -41,7 +47,7 @@ const Register = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         label="Password" placeholder="Enter your password" />
-                    <button className='button' type="submit">Register</button>
+                    <button className='button' type="submit" disabled={loading}>{loading ? 'Loading...' : 'Register'}</button>
                 </form>
                 <p>Already have an account? <Link to="/login">Login here</Link></p>
             </div>

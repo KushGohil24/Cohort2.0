@@ -33,4 +33,21 @@
             }
         }
     }
+
+    p {
+        text-align: center;
+        margin-top: 1rem;
+        
+        a {
+            color: var(--accent-primary, #a78bfa);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+
+            &:hover {
+                color: #c4b5fd;
+                text-decoration: underline;
+            }
+        }
+    }
 }

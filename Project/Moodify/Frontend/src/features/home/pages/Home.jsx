@@ -119,12 +119,14 @@ const Home = () => {
             />
 
             <main className="aura-main">
-                {activeTab === 'home' && (
-                    <FaceExpression 
-                        onMoodDetected={(detected) => setMood(detected)} 
-                        currentMood={mood} 
-                    />
-                )}
+                <div style={{ display: activeTab === 'home' ? 'block' : 'none', height: '100%' }}>
+                    {React.useMemo(() => (
+                        <FaceExpression 
+                            onMoodDetected={(detected) => setMood(detected)} 
+                            currentMood={mood} 
+                        />
+                    ), [mood])}
+                </div>
                 
                 {activeTab === 'search' && (
                     <div className="search-panel" style={{ width: '100%', maxWidth: '600px', margin: '0 auto', paddingTop: '40px' }}>

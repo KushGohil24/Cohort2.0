@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../auth/hooks/useAuth';
 import './Sidebar.scss';
 
 const MOODS = [
@@ -14,6 +15,8 @@ const Sidebar = ({ currentMood, onMoodSelect, onRecalibrate, activeTab, onTabSel
         onTabSelect(tab);
     };
 
+    const { handleLogout } = useAuth();
+    
     return (
         <aside className="aura-sidebar">
             <div className="sidebar-brand">
@@ -68,9 +71,9 @@ const Sidebar = ({ currentMood, onMoodSelect, onRecalibrate, activeTab, onTabSel
 
             <div className="sidebar-footer">
                 <div className="recalibrate-card">
-                    <p>Feeling different?</p>
-                    <button onClick={onRecalibrate} className="recalibrate-btn">
-                        RECALIBRATE MOOD
+                    <p>Done listening?</p>
+                    <button onClick={handleLogout} className="recalibrate-btn">
+                        LOGOUT
                     </button>
                 </div>
             </div>
