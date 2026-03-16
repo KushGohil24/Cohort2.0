@@ -17,6 +17,19 @@ app.use(cors({
 const authRoutes = require("./routes/auth.routes");
 const songRoutes = require("./routes/song.routes");
 const path = require("path");
+const connectToDB = require("./config/database");
+
+// --- SERVERLESS DATABASE MIDDLEWARE ---
+// Vercel doesn't wait for server.js async tasks. We must ensure the DB is connected
+// before ANY route logic fires.
+app.use(async (req, res, next) => {
+    try {
+        await connectToDB();
+        next();
+    } catch (error) {
+        res.status(500).json({ message: "Database connection failed" });
+    }
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/songs", songRoutes);
