@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+/* 🌑 Obsidian Intelligence Theme */
+:root {
+  --surface: #0e0e0e;
+  --surface-low: #131313;
+  --surface-container: #191a1a;
+  --surface-high: #1f2020;
+  --surface-highest: #252626;
+  --surface-bright: #2b2c2c;
+
+  --primary: #44dfab;
+  --primary-dark: #00513a;
+
+  --text-primary: #e7e5e5;
+  --text-secondary: #acabaa;
+}
+
+/* Global styles */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--surface);
+  color: var(--text-primary);
+}
+
+input:focus {
+  box-shadow: 0 0 0 2px rgba(68, 223, 171, 0.1);
+}
