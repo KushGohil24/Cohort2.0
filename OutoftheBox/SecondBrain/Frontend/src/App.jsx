@@ -3,10 +3,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
+import Collections from './pages/Collections';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import SaveItemModal from './components/items/SaveItemModal';
 import { createItem } from './services/api';
+import { UIProvider } from './context/UIContext';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -38,30 +40,36 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <SaveItemModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} onSave={handleSaveItem} />
-      
-      <Routes>
-        <Route path="/login" element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        } />
-        <Route path="/register" element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        } />
+    <UIProvider>
+      <BrowserRouter>
+        <SaveItemModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} onSave={handleSaveItem} />
         
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Layout onAddClick={handleAddClick} />
-          </ProtectedRoute>
-        }>
-          <Route index element={<Dashboard refreshTrigger={refreshTrigger} />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+        <Routes>
+          <Route path="/login" element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          } />
+          <Route path="/register" element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          } />
+          
+          <Route path="/" element={
+            <ProtectedRoute>
+              <Layout onAddClick={handleAddClick} />
+            </ProtectedRoute>
+          }>
+            <Route index element={<Dashboard refreshTrigger={refreshTrigger} />} />
+            <Route path="type/:type" element={<Dashboard refreshTrigger={refreshTrigger} />} />
+            <Route path="collections" element={<Collections />} />
+            <Route path="collection/:collectionId" element={<Dashboard refreshTrigger={refreshTrigger} />} />
+            <Route path="favorites" element={<Dashboard refreshTrigger={refreshTrigger} filterFavorites={true} />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </UIProvider>
   );
 }
 

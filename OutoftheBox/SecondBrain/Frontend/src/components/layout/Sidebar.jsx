@@ -14,8 +14,8 @@ const Sidebar = () => {
     { name: 'PDFs', icon: 'picture_as_pdf', path: '/type/pdf' },
     { name: 'Images', icon: 'image', path: '/type/image' },
     { name: 'Notes', icon: 'edit_note', path: '/type/note' },
-    { name: 'Favorites', icon: 'grade', path: '/favorites' },
     { name: 'Collections', icon: 'folder_open', path: '/collections' },
+    { name: 'Favorites', icon: 'grade', path: '/favorites' },
   ];
 
   return (

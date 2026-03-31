@@ -137,11 +137,13 @@ const KnowledgeGraph = ({ onNodeClick }) => {
         }}
         onNodeHover={(node) => {
           if (graphRef.current) {
-            const canvas = graphRef.current.getCanvasElement();
-            if (node) {
-               canvas.style.cursor = node.group === 'item' ? 'zoom-in' : 'pointer';
-            } else {
-               canvas.style.cursor = 'grab';
+            const canvas = graphRef.current.getCanvasElement?.();
+            if (canvas) {
+              if (node) {
+                 canvas.style.cursor = node.group === 'item' ? 'zoom-in' : 'pointer';
+              } else {
+                 canvas.style.cursor = 'grab';
+              }
             }
           }
         }}

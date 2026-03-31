@@ -24,9 +24,17 @@ export const registerCall = async (name, email, password) => {
   return data;
 };
 
-export const getItems = async (type) => {
-  const url = type ? `/items/filter?type=${type}` : '/items';
+export const getItems = async (type, collectionId) => {
+  let url = '/items';
+  if (type) url = `/items/filter?type=${type}`;
+  else if (collectionId) url = `/items/filter?collectionId=${collectionId}`;
+  
   const { data } = await api.get(url);
+  return data;
+};
+
+export const searchItems = async (q) => {
+  const { data } = await api.get(`/items/search?q=${encodeURIComponent(q)}`);
   return data;
 };
 

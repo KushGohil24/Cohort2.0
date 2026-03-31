@@ -36,8 +36,7 @@ const SaveItemModal = ({ isOpen, onClose, onSave }) => {
     }
   }, [isOpen]);
 
-  // You will need to replace this with your actual imagekit public key or fetch it from backend
-  const IMAGEKIT_PUBLIC_KEY = import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY || "public_dummy";
+
 
   if (!isOpen) return null;
 
@@ -102,9 +101,14 @@ const SaveItemModal = ({ isOpen, onClose, onSave }) => {
   const uploadToImageKit = async (selectedFile) => {
     try {
       const authData = await getUploadAuth();
+      if (!authData.publicKey || authData.publicKey.includes("dummy")) {
+        toast.error("ImageKit is not configured in backend .env");
+        throw new Error("Missing ImageKit config");
+      }
+
       const formData = new FormData();
       formData.append("file", selectedFile);
-      formData.append("publicKey", IMAGEKIT_PUBLIC_KEY); // Replace with your key
+      formData.append("publicKey", authData.publicKey);
       formData.append("signature", authData.signature);
       formData.append("expire", authData.expire);
       formData.append("token", authData.token);

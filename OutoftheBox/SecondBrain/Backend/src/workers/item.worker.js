@@ -17,21 +17,44 @@ export const itemWorker = new Worker('item-processing', async (job) => {
     console.log(`[ItemWorker] Commencing deep extraction and AI mapping for ${item.title}`);
     
     // --- STEP 1: DEEP TEXT EXTRACTION ---
-    // Make sure we have enough raw text or description to analyze
-    const textToAnalyze = item.rawText || item.description || item.title || "";
+    // Make sure we have enough raw text or description to analyze. 
+    // For images/files, we prepend the type to help the AI contextualize.
+    const typeLabel = item.type ? `[Type: ${item.type.toUpperCase()}] ` : "";
+    const textToAnalyze = typeLabel + (item.rawText || item.description || item.title || "");
 
     // --- STEP 2: MISTRAL SUMMARIZATION & TAGGING ---
-    if (textToAnalyze.length > 10 && process.env.MISTRAL_API_KEY) {
+    const MISTRAL_KEY = process.env.MISTRAL_API_KEY;
+    if (MISTRAL_KEY && (textToAnalyze.length > 10 || item.type === 'image')) {
       console.log(`[ItemWorker] Sending context to Mistral for ${item.title}`);
-      const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
+      const client = new Mistral({ apiKey: MISTRAL_KEY });
       
+      const isImage = item.type === 'image' && (item.fileUrl || item.url);
+      const model = isImage ? "pixtral-12b-2409" : "mistral-small-latest";
+      
+      let messages = [
+        { role: "system", content: "You are a semantic processing engine. Return a strictly valid JSON object containing exactly two keys: 'summary' (a concise 1-sentence overview) and 'tags' (an array of 3-5 high-level structural category strings). Do not use markdown blocks." }
+      ];
+
+      if (isImage) {
+        messages.push({
+          role: "user",
+          content: [
+            { type: "text", text: `Analyze this image and provide a concise 1-sentence summary and 3-5 semantic tags. Title: ${item.title}` },
+            { type: "image_url", imageUrl: item.fileUrl || item.url }
+          ]
+        });
+      } else {
+        messages.push({
+          role: "user",
+          content: `Please analyze this content and provide a concise 1-sentence summary and 3-5 semantic tags: ${textToAnalyze}`
+        });
+      }
+
+      console.log(`[ItemWorker] Prompting ${model}...`);
       const completion = await client.chat.complete({
-        model: "mistral-small-latest",
-        messages: [
-          { role: "system", content: "You are a semantic processing engine. Return a strictly valid JSON object containing exactly two keys: 'summary' (a concise 1-2 sentence overview) and 'tags' (an array of 3-5 high-level structural category strings). Do not use markdown blocks." },
-          { role: "user", content: `Please analyze this content: ${textToAnalyze}` }
-        ],
-        temperature: 0.3,
+        model: model,
+        messages: messages,
+        temperature: 0.2,
         responseFormat: { type: "json_object" }
       });
       
@@ -43,7 +66,7 @@ export const itemWorker = new Worker('item-processing', async (job) => {
         console.warn("[ItemWorker] Failed to parse Mistral JSON output:", parseError);
       }
     } else {
-      console.log(`[ItemWorker] Skipping Mistral enrichment (Insufficient text or Missing API Key).`);
+      console.log(`[ItemWorker] Skipping Mistral enrichment (Insufficient info or Missing API Key).`);
     }
 
     // --- STEP 3: MISTRAL VECTOR EMBEDDINGS ---

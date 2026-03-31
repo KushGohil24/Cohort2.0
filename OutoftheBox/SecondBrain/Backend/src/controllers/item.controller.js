@@ -7,6 +7,8 @@ import Collection from "../models/collection.model.js";
 
 export const createItem = async (req, res) => {
   try {
+    const { url, type, title, description, tags, collectionIds, fileUrl } = req.body;
+    
     let sanitizedCollectionIds = [];
     if (Array.isArray(collectionIds)) {
       sanitizedCollectionIds = collectionIds.filter(id => mongoose.Types.ObjectId.isValid(id));

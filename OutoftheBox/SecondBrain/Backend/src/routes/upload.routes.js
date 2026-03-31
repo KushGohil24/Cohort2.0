@@ -12,8 +12,11 @@ const imagekit = new ImageKit({
 
 router.get("/auth", protectRoute, (req, res) => {
   try {
-    const result = imagekit.getAuthenticationParameters();
-    res.json(result);
+    const params = imagekit.getAuthenticationParameters();
+    res.json({
+      ...params,
+      publicKey: process.env.IMAGEKIT_PUBLIC_KEY
+    });
   } catch (error) {
     console.error("ImageKit Auth Error:", error);
     res.status(500).json({ message: "Failed to generate auth params" });

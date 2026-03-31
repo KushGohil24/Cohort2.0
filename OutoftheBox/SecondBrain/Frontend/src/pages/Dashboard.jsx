@@ -2,9 +2,14 @@ import React, { useEffect, useState } from 'react';
 import ItemCard from '../components/items/ItemCard';
 import ItemDetailDrawer from '../components/items/ItemDetailDrawer';
 import KnowledgeGraph from '../components/items/KnowledgeGraph';
-import { getItems, deleteItem, updateItem } from '../services/api';
+import { getItems, deleteItem, updateItem, searchItems } from '../services/api';
+import { useUI } from '../context/UIContext';
+import { useParams } from 'react-router-dom';
 
-const Dashboard = ({ refreshTrigger }) => {
+const Dashboard = ({ refreshTrigger, filterFavorites }) => {
+  const { type, collectionId } = useParams();
+  const { debouncedSearch, sortBy } = useUI();
+  
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -12,7 +17,25 @@ const Dashboard = ({ refreshTrigger }) => {
 
   const fetchItems = async (isPoll = false) => {
     try {
-      const data = await getItems();
+      let data = [];
+      if (debouncedSearch) {
+        data = await searchItems(debouncedSearch);
+      } else {
+        data = await getItems(type, collectionId);
+      }
+
+      // Client-side filtering for favorites if enabled
+      if (filterFavorites) {
+        data = data.filter(item => item.isFavorite);
+      }
+
+      // Client-side sorting
+      data.sort((a, b) => {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+        return sortBy === 'newest' ? dateB - dateA : dateA - dateB;
+      });
+
       setItems(data);
     } catch (err) {
       console.error("Failed to fetch items", err);
@@ -22,8 +45,9 @@ const Dashboard = ({ refreshTrigger }) => {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchItems();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, debouncedSearch, sortBy, type, collectionId, filterFavorites]);
 
   // Polling for AI processing status
   useEffect(() => {
@@ -76,8 +100,17 @@ const Dashboard = ({ refreshTrigger }) => {
 
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold font-headline tracking-tight text-white mb-1">Knowledge Garden</h2>
-          <p className="text-slate-400 font-body">Harvested thoughts and curated insights from your digital journey.</p>
+          <h2 className="text-3xl font-bold font-headline tracking-tight text-white mb-1">
+            {debouncedSearch ? `Search: "${debouncedSearch}"` : 
+             filterFavorites ? 'Favorites' :
+             type ? type.charAt(0).toUpperCase() + type.slice(1) + 's' :
+             collectionId ? 'Collection Archive' :
+             'Knowledge Garden'}
+          </h2>
+          <p className="text-slate-400 font-body">
+            {debouncedSearch ? `Found ${items.length} relevant neural nodes` : 
+             'Harvested thoughts and curated insights from your digital journey.'}
+          </p>
         </div>
         
         <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10 backdrop-blur-md self-start md:self-auto">
