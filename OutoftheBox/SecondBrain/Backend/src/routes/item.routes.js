@@ -7,7 +7,8 @@ import {
   deleteItem, 
   searchItems, 
   filterItems,
-  getGraphData
+  getGraphData,
+  getRelatedItems
 } from "../controllers/item.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -28,5 +29,7 @@ router.route("/:id")
   .get(getItemById)
   .patch(updateItem)
   .delete(deleteItem);
+
+router.get("/:id/related", getRelatedItems);
 
 export default router;

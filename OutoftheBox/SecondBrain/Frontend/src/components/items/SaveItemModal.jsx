@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { getUploadAuth, extractUrl } from '../../services/api';
+import { getUploadAuth, extractUrl, getCollections } from '../../services/api';
 import toast from 'react-hot-toast';
+
 
 const SaveItemModal = ({ isOpen, onClose, onSave }) => {
   const [activeTab, setActiveTab] = useState('url'); // 'url' or 'file'
@@ -12,12 +13,28 @@ const SaveItemModal = ({ isOpen, onClose, onSave }) => {
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
-  const [collection, setCollection] = useState('Reading List');
+  const [collection, setCollection] = useState('');
   
   const [thumbnail, setThumbnail] = useState(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [collections, setCollections] = useState([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      const fetchCollections = async () => {
+        try {
+          const data = await getCollections();
+          setCollections(data);
+          if (data.length > 0) setCollection(data[0]._id);
+        } catch (err) {
+          console.error("Failed to fetch collections", err);
+        }
+      };
+      fetchCollections();
+    }
+  }, [isOpen]);
 
   // You will need to replace this with your actual imagekit public key or fetch it from backend
   const IMAGEKIT_PUBLIC_KEY = import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY || "public_dummy";
@@ -35,6 +52,12 @@ const SaveItemModal = ({ isOpen, onClose, onSave }) => {
       setTitle(data.title || "");
       setDescription(data.description || "");
       setThumbnail(data.thumbnail || "");
+      
+      // Auto-populate tags from AI suggestions
+      if (data.aiTags && data.aiTags.length > 0) {
+        setTags(prev => [...new Set([...prev, ...data.aiTags])]);
+      }
+      
       setIsPreviewing(true);
       toast.success("Content extracted successfully!");
     } catch (err) {
@@ -111,7 +134,7 @@ const SaveItemModal = ({ isOpen, onClose, onSave }) => {
            title: title || file.name,
            description,
            tags,
-           collectionIds: [], // mapped in backend
+           collectionIds: (collection && collection !== "") ? [collection] : [],
            fileUrl: uploadedUrl
         });
       } else {
@@ -120,7 +143,7 @@ const SaveItemModal = ({ isOpen, onClose, onSave }) => {
           title: title || undefined, 
           description: description || undefined, 
           tags, 
-          collection 
+          collectionIds: (collection && collection !== "") ? [collection] : []
         });
       }
       onClose();
@@ -289,10 +312,13 @@ const SaveItemModal = ({ isOpen, onClose, onSave }) => {
                       value={collection}
                       onChange={(e) => setCollection(e.target.value)}
                     >
-                      <option>Reading List</option>
-                      <option>AI Research</option>
-                      <option>Project Phoenix</option>
-                      <option>Archive</option>
+                      {collections.length > 0 ? (
+                        collections.map(c => (
+                          <option key={c._id} value={c._id}>{c.name}</option>
+                        ))
+                      ) : (
+                        <option value="">No Collections</option>
+                      )}
                     </select>
                     <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-outline">expand_more</span>
                   </div>

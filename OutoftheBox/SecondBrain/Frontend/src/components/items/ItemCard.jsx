@@ -33,11 +33,32 @@ const ItemCard = ({ item, onDelete, onUpdate }) => {
     </div>
   );
 
+  const renderProcessingOverlay = () => {
+    if (item.status === 'completed' || !item.status) return null;
+    return (
+      <div className="absolute inset-0 z-10 bg-slate-950/60 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center">
+        <div className="flex gap-1 mb-3">
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+        </div>
+        <p className="text-xs font-bold text-white uppercase tracking-widest">AI Enrichment</p>
+        <p className="text-[10px] text-slate-400 mt-1">Deep analysis in progress...</p>
+      </div>
+    );
+  };
+
   const renderTags = () => (
     <div className="mt-auto flex flex-wrap gap-2 mb-4 pt-4">
       {item.tags?.map((tag) => (
         <span key={tag} className="px-2 py-0.5 bg-secondary-container/20 text-secondary text-[10px] font-semibold rounded-md">
           #{tag}
+        </span>
+      ))}
+      {item.aiTags?.map((tag) => (
+        <span key={tag} className="px-2 py-0.5 bg-primary-container/20 text-primary text-[10px] font-semibold rounded-md flex items-center gap-1">
+          <span className="material-symbols-outlined text-[10px]" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
+          {tag}
         </span>
       ))}
     </div>
@@ -47,7 +68,8 @@ const ItemCard = ({ item, onDelete, onUpdate }) => {
   switch (item.type) {
     case 'article':
       return (
-        <div className="group relative bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:bg-surface-container-high hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-950/50 flex flex-col h-full">
+        <div className="group relative bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:bg-surface-container-high hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-950/50 flex flex-col h-full border border-white/5">
+          {renderProcessingOverlay()}
           <div className="aspect-video w-full overflow-hidden relative shrink-0">
             <img 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
@@ -81,7 +103,8 @@ const ItemCard = ({ item, onDelete, onUpdate }) => {
 
     case 'youtube':
       return (
-        <div className="group relative bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:bg-surface-container-high hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-950/50 flex flex-col h-full">
+        <div className="group relative bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:bg-surface-container-high hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-950/50 flex flex-col h-full border border-white/5">
+          {renderProcessingOverlay()}
           <div className="aspect-video w-full overflow-hidden relative shrink-0">
             <img 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 

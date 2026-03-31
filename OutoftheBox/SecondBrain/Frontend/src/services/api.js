@@ -55,4 +55,9 @@ export const extractUrl = async (url) => {
   return data;
 };
 
+export const getCollections = async () => {
+  const { data } = await api.get('/collections');
+  return data;
+};
+
 export default api;

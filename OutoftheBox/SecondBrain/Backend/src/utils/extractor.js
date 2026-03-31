@@ -54,20 +54,53 @@ export async function extractFromUrl(url) {
       let title = `YouTube Video`;
       let description = null;
       try {
+        // Fetch HTML to get metadata
+        const { data: ytHtml } = await axios.get(url, { 
+          headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" },
+          timeout: 5000
+        });
+        const $yt = cheerio.load(ytHtml);
+        
+        // Try to get the full description from ytInitialPlayerResponse or ytInitialData
+        const ytDataMatch = ytHtml.match(/ytInitialPlayerResponse\s*=\s*({.+?});/s) || ytHtml.match(/var ytInitialData\s*=\s*({.+?});/s);
+        if (ytDataMatch) {
+          try {
+            const ytData = JSON.parse(ytDataMatch[1]);
+            // Check in videoDetails or in contents section (more complex)
+            let fullDesc = ytData.videoDetails?.shortDescription;
+            
+            // If still missing or truncated, try deeper (simplified)
+            if (!fullDesc) {
+               // Logic to drill down into ytInitialData if needed (omitted for brevity unless required)
+            }
+            if (fullDesc) description = fullDesc;
+          } catch (pErr) {
+            console.warn("Failed to parse YouTube initial data JSON");
+          }
+        }
+
+        // Fallback to meta tags if JSON parsing fails
+        if (!description) {
+          description = 
+            $yt('meta[property="og:description"]').attr("content") || 
+            $yt('meta[name="description"]').attr("content") || 
+            null;
+        }
+          
+        // Clean up "..." truncation from description if possible
+        if (description && description.endsWith('...')) {
+           console.log("YouTube description still truncated, will supplement with AI later.");
+        }
+
         const oembed = await axios.get(`https://www.youtube.com/oembed?url=${url}&format=json`, { timeout: 5000 });
         title = oembed.data.title;
-        
-        // Also attempt to get the meta description
-        const { data: ytHtml } = await axios.get(url, { headers: { "User-Agent": "Mozilla/5.0" }});
-        const $yt = cheerio.load(ytHtml);
-        description = $yt('meta[name="description"]').attr("content") || $yt('meta[property="og:description"]').attr("content");
       } catch (err) {
         console.warn("YouTube extraction failed", err.message);
       }
       return {
         type, url, domain, favicon, videoId,
         title,
-        thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+        thumbnail: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`, // Use higher quality thumbnail
         description, rawText: description,
       };
     }
@@ -101,6 +134,9 @@ export async function extractFromUrl(url) {
     const title = $('meta[property="og:title"]').attr("content") || $("title").text() || "Untitled";
     const description = $('meta[property="og:description"]').attr("content") || $('meta[name="description"]').attr("content") || null;
     const thumbnail = $('meta[property="og:image"]').attr("content") || null;
+    
+    // Improved rawText extraction: remove scripts, styles, and junk
+    $('script, style, nav, footer, header, noscript, .ad, .ads, #ads').remove();
     const rawText = $("body").text().replace(/\s+/g, " ").trim().slice(0, 5000);
 
     return {

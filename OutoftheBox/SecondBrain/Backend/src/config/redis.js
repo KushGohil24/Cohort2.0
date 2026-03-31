@@ -10,6 +10,10 @@ const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', 
   }
 });
 
+connection.on('connect', () => {
+  console.log('✅ Redis connected');
+});
+
 connection.on('error', (err) => {
   console.warn('⚠️ Redis connection error: Semantic AI features (BullMQ) will be disabled until Redis is active.');
 });

@@ -1,7 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import api from '../../services/api';
 
-const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate }) => {
+const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate, onSelectItem }) => {
+  const [relatedItems, setRelatedItems] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
+  const [isAddingTag, setIsAddingTag] = useState(false);
+  const [newTag, setNewTag] = useState('');
+
+  useEffect(() => {
+    if (isOpen && item?._id) {
+      const fetchRelated = async () => {
+        setLoadingRelated(true);
+        try {
+          const { data } = await api.get(`/items/${item._id}/related`);
+          setRelatedItems(data);
+        } catch (err) {
+          console.error("Failed to fetch related items", err);
+        } finally {
+          setLoadingRelated(false);
+        }
+      };
+      fetchRelated();
+    } else {
+      setRelatedItems([]);
+    }
+  }, [isOpen, item?._id]);
+
   if (!isOpen || !item) return null;
 
   const handleShare = () => {
@@ -12,6 +37,22 @@ const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate }) => {
     } else {
       toast.error('No link available to share');
     }
+  };
+
+  const handleAddTag = (e) => {
+    if (e.key === 'Enter' && newTag.trim()) {
+      const updatedTags = [...(item.tags || []), newTag.trim()];
+      onUpdate(item._id, { tags: updatedTags });
+      setNewTag('');
+      setIsAddingTag(false);
+      toast.success('Tag added');
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    const updatedTags = item.tags.filter(t => t !== tagToRemove);
+    onUpdate(item._id, { tags: updatedTags });
+    toast.success('Tag removed');
   };
 
   return (
@@ -80,12 +121,34 @@ const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate }) => {
               {item.tags?.map((tag) => (
                 <span key={tag} className="px-3 py-1.5 rounded-lg bg-surface-container-high text-slate-300 text-xs font-medium flex items-center gap-2 hover:bg-white/10 cursor-pointer transition-colors group">
                   #{tag}
-                  <span className="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">close</span>
+                  <span onClick={(e) => { e.stopPropagation(); removeTag(tag); }} className="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 transition-opacity hover:text-error">close</span>
                 </span>
               ))}
-              <button className="p-1.5 rounded-lg border border-dashed border-slate-700 text-slate-500 hover:text-indigo-400 hover:border-indigo-400/50 transition-all flex items-center justify-center">
-                <span className="material-symbols-outlined text-[18px]">add</span>
-              </button>
+              {item.aiTags?.map((tag) => (
+                <span key={tag} className="px-3 py-1.5 rounded-lg bg-primary-container/20 text-primary text-xs font-bold flex items-center gap-2 border border-primary/20 cursor-default">
+                  <span className="material-symbols-outlined text-[16px]" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
+                  {tag}
+                </span>
+              ))}
+              
+              {isAddingTag ? (
+                <input
+                  autoFocus
+                  className="px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-primary/50 text-white text-xs outline-none w-24"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyDown={handleAddTag}
+                  onBlur={() => setIsAddingTag(false)}
+                  placeholder="Tag..."
+                />
+              ) : (
+                <button 
+                  onClick={() => setIsAddingTag(true)}
+                  className="p-1.5 rounded-lg border border-dashed border-slate-700 text-slate-500 hover:text-indigo-400 hover:border-indigo-400/50 transition-all flex items-center justify-center"
+                >
+                  <span className="material-symbols-outlined text-[18px]">add</span>
+                </button>
+              )}
             </div>
 
             {/* Action Grid */}
@@ -102,12 +165,68 @@ const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate }) => {
               </button>
             </div>
 
+            {/* AI Insight Section */}
+            {item.aiSummary && (
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 mb-8 mt-2 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-50 transition-opacity">
+                  <span className="material-symbols-outlined text-4xl text-primary" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
+                </div>
+                <h3 className="text-xs font-bold text-primary uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm" style={{fontVariationSettings: "'FILL' 1"}}>auto_awesome</span>
+                  AI Semantic Insight
+                </h3>
+                <p className="text-sm text-slate-100 leading-relaxed font-headline italic">
+                  "{item.aiSummary}"
+                </p>
+              </div>
+            )}
+
             {/* Description */}
-            <div className="space-y-4 mb-4">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Summary & Description</h3>
-              <p className="text-slate-300 leading-relaxed font-body whitespace-pre-wrap">
-                {item.description || item.rawText || "No description provided."}
-              </p>
+            <div className="space-y-4 mb-10">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Original Context</h3>
+              <div className="p-4 rounded-xl bg-slate-950/30 border border-white/5">
+                <p className="text-slate-400 leading-relaxed font-body whitespace-pre-wrap text-sm line-clamp-[10] hover:line-clamp-none transition-all">
+                  {item.description || item.rawText || "No additional context available."}
+                </p>
+              </div>
+            </div>
+
+            {/* Related Concepts / Items Section */}
+            <div className="space-y-4 border-t border-white/5 pt-8 mb-8">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <span className="material-symbols-outlined text-sm">hub</span>
+                Related Concepts
+              </h3>
+              
+              {loadingRelated ? (
+                <div className="flex gap-4 overflow-x-auto pb-4">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="w-40 h-24 shrink-0 rounded-xl bg-white/5 animate-pulse"></div>
+                  ))}
+                </div>
+              ) : relatedItems.length > 0 ? (
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                  {relatedItems.map(related => (
+                    <div 
+                      key={related._id}
+                      onClick={() => onSelectItem && onSelectItem(related)}
+                      className="w-48 shrink-0 p-3 rounded-xl bg-surface-container-high border border-white/5 hover:border-primary/30 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="material-symbols-outlined text-[14px] text-slate-500">
+                          {related.type === 'youtube' ? 'play_circle' : 'article'}
+                        </span>
+                        <span className="text-[9px] text-slate-500 font-bold uppercase truncate">{related.type}</span>
+                      </div>
+                      <h4 className="text-xs font-bold text-slate-200 line-clamp-2 group-hover:text-primary transition-colors">
+                        {related.name || related.title}
+                      </h4>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[10px] text-slate-600 italic">No semantic relatives discovered yet.</p>
+              )}
             </div>
           </div>
         </div>

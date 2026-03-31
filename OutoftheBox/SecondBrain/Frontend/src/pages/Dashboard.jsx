@@ -1,26 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import ItemCard from '../components/items/ItemCard';
 import ItemDetailDrawer from '../components/items/ItemDetailDrawer';
+import KnowledgeGraph from '../components/items/KnowledgeGraph';
 import { getItems, deleteItem, updateItem } from '../services/api';
 
 const Dashboard = ({ refreshTrigger }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [view, setView] = useState('grid'); // 'grid' or 'graph'
+
+  const fetchItems = async (isPoll = false) => {
+    try {
+      const data = await getItems();
+      setItems(data);
+    } catch (err) {
+      console.error("Failed to fetch items", err);
+    } finally {
+      if (!isPoll) setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const data = await getItems();
-        setItems(data);
-      } catch (err) {
-        console.error("Failed to fetch items", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchItems();
   }, [refreshTrigger]);
+
+  // Polling for AI processing status
+  useEffect(() => {
+    const hasProcessingItems = items.some(item => 
+      item.status === 'pending' || item.status === 'processing'
+    );
+
+    if (hasProcessingItems) {
+      const interval = setInterval(() => {
+        fetchItems(true);
+      }, 3000); // Poll every 3 seconds until completed
+      return () => clearInterval(interval);
+    }
+  }, [items]);
 
   const handleDelete = async (id) => {
     try {
@@ -54,14 +71,40 @@ const Dashboard = ({ refreshTrigger }) => {
         onClose={() => setSelectedItem(null)} 
         onDelete={(id) => handleDelete(id)}
         onUpdate={(id, updates) => handleUpdate(id, updates)}
+        onSelectItem={(item) => setSelectedItem(item)}
       />
 
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold font-headline tracking-tight text-white mb-1">Knowledge Garden</h2>
-        <p className="text-slate-400 font-body">Harvested thoughts and curated insights from your digital journey.</p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold font-headline tracking-tight text-white mb-1">Knowledge Garden</h2>
+          <p className="text-slate-400 font-body">Harvested thoughts and curated insights from your digital journey.</p>
+        </div>
+        
+        <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10 backdrop-blur-md self-start md:self-auto">
+          <button 
+            onClick={() => setView('grid')}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold transition-all ${view === 'grid' ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : 'text-slate-400 hover:text-white'}`}
+          >
+            <span className="material-symbols-outlined text-lg">grid_view</span>
+            Grid
+          </button>
+          <button 
+            onClick={() => setView('graph')}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold transition-all ${view === 'graph' ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : 'text-slate-400 hover:text-white'}`}
+          >
+            <span className="material-symbols-outlined text-lg">bubble_chart</span>
+            Graph
+          </button>
+        </div>
       </div>
 
-      {items.length === 0 ? (
+      {loading ? (
+        <div className="flex items-center justify-center p-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary"></div>
+        </div>
+      ) : view === 'graph' ? (
+        <KnowledgeGraph onNodeClick={(node) => setSelectedItem(items.find(i => String(i._id) === String(node.id)))} />
+      ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 bg-surface-container-low rounded-xl border border-dashed border-white/10 text-center">
           <span className="material-symbols-outlined text-4xl text-slate-500 mb-4">inbox</span>
           <h3 className="text-xl font-bold text-white mb-2">Sanctuary Empty</h3>

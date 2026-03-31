@@ -3,10 +3,16 @@ import { extractFromUrl } from "../utils/extractor.js";
 import { itemQueue } from "../queue/item.queue.js";
 import { Mistral } from "@mistralai/mistralai";
 import mongoose from "mongoose";
+import Collection from "../models/collection.model.js";
 
 export const createItem = async (req, res) => {
   try {
-    const { url, type, title, description, tags, collectionIds, fileUrl } = req.body;
+    let sanitizedCollectionIds = [];
+    if (Array.isArray(collectionIds)) {
+      sanitizedCollectionIds = collectionIds.filter(id => mongoose.Types.ObjectId.isValid(id));
+    } else if (typeof collectionIds === 'string' && mongoose.Types.ObjectId.isValid(collectionIds)) {
+      sanitizedCollectionIds = [collectionIds];
+    }
     
     let itemData = {
       userId: req.user.id,
@@ -14,7 +20,7 @@ export const createItem = async (req, res) => {
       title: title || "Untitled Note",
       description,
       tags: tags || [],
-      collectionIds: collectionIds || []
+      collectionIds: sanitizedCollectionIds
     };
 
     if (url) {
@@ -31,6 +37,18 @@ export const createItem = async (req, res) => {
       await itemQueue.add("process-ai", { itemId: item._id }, { jobId: `ai-${item._id}` });
     } catch (qErr) {
       console.warn("Queue push failed, item created without background job", qErr.message);
+    }
+
+    // Update collection counts if item was added to collections
+    if (sanitizedCollectionIds && sanitizedCollectionIds.length > 0) {
+      try {
+        for (const cid of sanitizedCollectionIds) {
+          const count = await Item.countDocuments({ collectionIds: cid });
+          await Collection.findByIdAndUpdate(cid, { itemCount: count });
+        }
+      } catch (collErr) {
+        console.warn("Collection count update failed", collErr.message);
+      }
     }
     
     res.status(201).json(item);
@@ -124,7 +142,7 @@ export const searchItems = async (req, res) => {
               limit: 20
             }
           },
-          { $match: { user: new mongoose.Types.ObjectId(req.user.id) } } // User field is named `user` not `userId` on the schema relation usually, but let's check
+          { $match: { userId: new mongoose.Types.ObjectId(req.user.id) } }
         ]);
       } catch (vecErr) {
         console.warn("Vector search failed or index missing. Falling back to text search", vecErr.message);
@@ -134,7 +152,7 @@ export const searchItems = async (req, res) => {
     // Fallback to basic text search if vector fails or is empty
     if (items.length === 0) {
       items = await Item.find({
-        user: req.user.id,
+        userId: req.user.id,
         $text: { $search: q }
       }).limit(20);
     }
@@ -161,35 +179,108 @@ export const filterItems = async (req, res) => {
   }
 };
 
+// Cosine Similarity Utility
+const cosineSimilarity = (vecA, vecB) => {
+  if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
+  let dotProduct = 0;
+  let mA = 0;
+  let mB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    mA += vecA[i] * vecA[i];
+    mB += vecB[i] * vecB[i];
+  }
+  mA = Math.sqrt(mA);
+  mB = Math.sqrt(mB);
+  if (mA === 0 || mB === 0) return 0;
+  return dotProduct / (mA * mB);
+};
+
 export const getGraphData = async (req, res) => {
   try {
-    const items = await Item.find({ user: req.user.id }).select('title type tags favicon');
+    const items = await Item.find({ userId: req.user.id }).select('title type tags aiTags embedding');
     
-    const nodes = items.map(i => ({ 
-      id: i._id.toString(), 
-      name: i.title, 
-      group: i.type, 
-      tags: i.tags || []
-    }));
-    
+    const nodes = [];
     const links = [];
-    
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const sharedTags = nodes[i].tags.filter(t => nodes[j].tags.includes(t));
-        if (sharedTags.length > 0) {
-          links.push({
-            source: nodes[i].id,
-            target: nodes[j].id,
-            strength: sharedTags.length
-          });
+    const tagsMap = new Map(); // track tag nodes
+
+    // 1. Create Item Nodes
+    items.forEach(i => {
+      nodes.push({ 
+        id: i._id.toString(), 
+        name: i.title || "Untitled", 
+        type: i.type, 
+        group: 'item',
+        val: 2 // base node size
+      });
+
+      // 2. Map Tags (Manual + AI)
+      const allTags = [...(i.tags || []), ...(i.aiTags || [])];
+      allTags.forEach(tag => {
+        if (!tagsMap.has(tag)) {
+          tagsMap.set(tag, { id: `tag-${tag}`, name: `#${tag}`, group: 'tag', val: 4 });
+          nodes.push(tagsMap.get(tag));
+        }
+        // Link Item to Tag
+        links.push({ source: i._id.toString(), target: `tag-${tag}`, type: 'tag-link', strength: 0.5 });
+      });
+    });
+
+    // 3. Semantic Similarity Links (cross-linking items)
+    for (let i = 0; i < items.length; i++) {
+      if (!items[i].embedding || items[i].embedding.length === 0) continue;
+      
+      let similarities = [];
+      for (let j = i + 1; j < items.length; j++) {
+        if (!items[j].embedding || items[j].embedding.length === 0) continue;
+        
+        const score = cosineSimilarity(items[i].embedding, items[j].embedding);
+        if (score > 0.85) { // High threshold
+          similarities.push({ target: items[j]._id.toString(), score });
         }
       }
+
+      similarities.sort((a, b) => b.score - a.score).slice(0, 2).forEach(s => {
+        links.push({ source: items[i]._id.toString(), target: s.target, type: 'semantic-link', strength: s.score });
+      });
     }
     
     res.json({ nodes, links });
   } catch (error) {
     console.error("Graph Data Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getRelatedItems = async (req, res) => {
+  try {
+    const item = await Item.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!item || !item.embedding || item.embedding.length === 0) {
+      return res.json([]); 
+    }
+
+    // Atlas Vector Search for similarity
+    const related = await Item.aggregate([
+      {
+        $vectorSearch: {
+          index: "vector_index",
+          path: "embedding",
+          queryVector: item.embedding,
+          numCandidates: 50,
+          limit: 6
+        }
+      },
+      { 
+        $match: { 
+          userId: new mongoose.Types.ObjectId(req.user.id),
+          _id: { $ne: item._id } // Exclude current item
+        } 
+      }
+    ]);
+
+    res.json(related);
+  } catch (error) {
+    console.error("Related Items Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
