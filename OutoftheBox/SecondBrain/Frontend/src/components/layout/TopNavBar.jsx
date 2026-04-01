@@ -27,12 +27,17 @@ const TopNavBar = ({ onAddClick }) => {
         {/* Navigation Links/Filter Chips */}
         <div className="hidden lg:flex items-center gap-1">
           <button 
-            onClick={() => setSearchQuery('')}
-            className={`px-4 py-1.5 transition-all font-medium ${!searchQuery ? 'text-indigo-300 border-b-2 border-indigo-500' : 'text-slate-400 hover:text-indigo-200'}`}
+            onClick={() => { setSearchQuery(''); setSortBy('oldest'); }}
+            className={`px-4 py-1.5 transition-all font-bold tracking-tight rounded-lg ${(!searchQuery && sortBy === 'oldest') ? 'bg-primary/10 text-primary' : 'text-slate-400 hover:text-indigo-200'}`}
           >
             All
           </button>
-          <button className="px-4 py-1.5 text-slate-400 hover:text-indigo-200 transition-all">Recent</button>
+          <button 
+            onClick={() => { setSearchQuery(''); setSortBy('newest'); }}
+            className={`px-4 py-1.5 transition-all font-bold tracking-tight rounded-lg ${(!searchQuery && sortBy === 'newest') ? 'bg-primary/10 text-primary' : 'text-slate-400 hover:text-indigo-200'}`}
+          >
+            Recent
+          </button>
         </div>
       </div>
 

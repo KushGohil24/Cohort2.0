@@ -6,7 +6,7 @@ import { getItems, deleteItem, updateItem, searchItems } from '../services/api';
 import { useUI } from '../context/UIContext';
 import { useParams } from 'react-router-dom';
 
-const Dashboard = ({ refreshTrigger, filterFavorites }) => {
+const Dashboard = ({ refreshTrigger, filterFavorites, isArchived }) => {
   const { type, collectionId } = useParams();
   const { debouncedSearch, sortBy } = useUI();
   
@@ -21,7 +21,7 @@ const Dashboard = ({ refreshTrigger, filterFavorites }) => {
       if (debouncedSearch) {
         data = await searchItems(debouncedSearch);
       } else {
-        data = await getItems(type, collectionId);
+        data = await getItems(type, collectionId, isArchived);
       }
 
       // Client-side filtering for favorites if enabled
@@ -47,7 +47,7 @@ const Dashboard = ({ refreshTrigger, filterFavorites }) => {
   useEffect(() => {
     setLoading(true);
     fetchItems();
-  }, [refreshTrigger, debouncedSearch, sortBy, type, collectionId, filterFavorites]);
+  }, [refreshTrigger, debouncedSearch, sortBy, type, collectionId, filterFavorites, isArchived]);
 
   // Polling for AI processing status
   useEffect(() => {
@@ -62,6 +62,16 @@ const Dashboard = ({ refreshTrigger, filterFavorites }) => {
       return () => clearInterval(interval);
     }
   }, [items]);
+  
+  // Keep selectedItem in sync with polling updates
+  useEffect(() => {
+    if (selectedItem) {
+      const latest = items.find(i => i._id === selectedItem._id);
+      if (latest && (latest.status !== selectedItem.status || latest.aiSummary !== selectedItem.aiSummary)) {
+        setSelectedItem(latest);
+      }
+    }
+  }, [items, selectedItem]);
 
   const handleDelete = async (id) => {
     try {
@@ -103,6 +113,7 @@ const Dashboard = ({ refreshTrigger, filterFavorites }) => {
           <h2 className="text-3xl font-bold font-headline tracking-tight text-white mb-1">
             {debouncedSearch ? `Search: "${debouncedSearch}"` : 
              filterFavorites ? 'Favorites' :
+             isArchived ? 'Archived Nodes' :
              type ? type.charAt(0).toUpperCase() + type.slice(1) + 's' :
              collectionId ? 'Collection Archive' :
              'Knowledge Garden'}

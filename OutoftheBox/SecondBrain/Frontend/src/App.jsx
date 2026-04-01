@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import SaveItemModal from './components/items/SaveItemModal';
 import { createItem } from './services/api';
 import { UIProvider } from './context/UIContext';
+import { Toaster } from 'react-hot-toast';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -42,6 +43,7 @@ function App() {
   return (
     <UIProvider>
       <BrowserRouter>
+        <Toaster position="bottom-right" />
         <SaveItemModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} onSave={handleSaveItem} />
         
         <Routes>
@@ -66,6 +68,7 @@ function App() {
             <Route path="collections" element={<Collections />} />
             <Route path="collection/:collectionId" element={<Dashboard refreshTrigger={refreshTrigger} />} />
             <Route path="favorites" element={<Dashboard refreshTrigger={refreshTrigger} filterFavorites={true} />} />
+            <Route path="archive" element={<Dashboard refreshTrigger={refreshTrigger} isArchived={true} />} />
           </Route>
         </Routes>
       </BrowserRouter>

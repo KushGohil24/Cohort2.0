@@ -62,7 +62,12 @@ export const createItem = async (req, res) => {
 
 export const getItems = async (req, res) => {
   try {
-    const items = await Item.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    const { isArchived } = req.query;
+    const query = { 
+      userId: req.user.id,
+      isArchived: isArchived === 'true' 
+    };
+    const items = await Item.find(query).sort({ createdAt: -1 });
     res.json(items);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
@@ -167,8 +172,11 @@ export const searchItems = async (req, res) => {
 
 export const filterItems = async (req, res) => {
   try {
-    const { type, tag, collectionId } = req.query;
+    const { type, tag, collectionId, isArchived } = req.query;
     let query = { userId: req.user.id };
+    
+    // Default to NOT showing archived items unless specifically requested
+    query.isArchived = isArchived === 'true';
     
     if (type) query.type = type;
     if (tag) query.tags = tag;

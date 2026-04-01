@@ -24,10 +24,10 @@ export const registerCall = async (name, email, password) => {
   return data;
 };
 
-export const getItems = async (type, collectionId) => {
-  let url = '/items';
-  if (type) url = `/items/filter?type=${type}`;
-  else if (collectionId) url = `/items/filter?collectionId=${collectionId}`;
+export const getItems = async (type, collectionId, isArchived = false) => {
+  let url = `/items?isArchived=${isArchived}`;
+  if (type) url = `/items/filter?type=${type}&isArchived=${isArchived}`;
+  else if (collectionId) url = `/items/filter?collectionId=${collectionId}&isArchived=${isArchived}`;
   
   const { data } = await api.get(url);
   return data;
@@ -65,6 +65,11 @@ export const extractUrl = async (url) => {
 
 export const getCollections = async () => {
   const { data } = await api.get('/collections');
+  return data;
+};
+
+export const createCollection = async (collectionData) => {
+  const { data } = await api.post('/collections', collectionData);
   return data;
 };
 

@@ -7,6 +7,7 @@ const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate, onSelectI
   const [loadingRelated, setLoadingRelated] = useState(false);
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newTag, setNewTag] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     if (isOpen && item?._id) {
@@ -33,9 +34,15 @@ const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate, onSelectI
     const link = item.url || item.fileUrl;
     if (link) {
       navigator.clipboard.writeText(link);
-      toast.success('Link copied to clipboard!');
+      toast.success('Link copied to sanctuary clipboard! 📋✨', {
+        style: {
+          background: '#0b1326',
+          color: '#fff',
+          border: '1px solid rgba(99, 102, 241, 0.2)'
+        }
+      });
     } else {
-      toast.error('No link available to share');
+      toast.error('No source link available to share');
     }
   };
 
@@ -59,12 +66,12 @@ const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate, onSelectI
     <>
       {/* Overlay Backdrop */}
       <div 
-        className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 transition-opacity" 
+        className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[55] transition-opacity" 
         onClick={onClose}
       ></div>
 
       {/* Item Detail Drawer */}
-      <aside className="fixed inset-y-0 right-0 w-[500px] max-w-[100vw] z-50 bg-slate-900 dark:bg-slate-950 flex flex-col h-full border-l border-white/5 font-headline shadow-2xl shadow-indigo-950/50 transform transition-transform duration-300">
+      <aside className="fixed inset-y-0 right-0 w-[500px] max-w-[100vw] z-[60] bg-slate-900 dark:bg-slate-950 flex flex-col h-full border-l border-white/5 font-headline shadow-2xl shadow-indigo-950/50 transform transition-transform duration-300">
         
         {/* Drawer Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-white/5 shrink-0">
@@ -81,7 +88,7 @@ const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate, onSelectI
         </div>
 
         {/* Drawer Scrollable Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
           {/* Full Thumbnail */}
           <div className="w-full aspect-video overflow-hidden relative group shrink-0">
             <img 
@@ -183,9 +190,19 @@ const ItemDetailDrawer = ({ item, isOpen, onClose, onDelete, onUpdate, onSelectI
 
             {/* Description */}
             <div className="space-y-4 mb-10">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Original Context</h3>
-              <div className="p-4 rounded-xl bg-slate-950/30 border border-white/5">
-                <p className="text-slate-400 leading-relaxed font-body whitespace-pre-wrap text-sm line-clamp-[10] hover:line-clamp-none transition-all">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Original Context</h3>
+                {(item.description?.length > 300 || item.rawText?.length > 300) && (
+                  <button 
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="text-[10px] font-bold text-primary uppercase hover:underline"
+                  >
+                    {isExpanded ? 'Show Less' : 'Show More'}
+                  </button>
+                )}
+              </div>
+              <div className="p-4 rounded-xl bg-slate-950/30 border border-white/5 relative group transition-all duration-300">
+                <p className={`text-slate-400 leading-relaxed font-body whitespace-pre-wrap text-sm ${!isExpanded ? 'line-clamp-6' : ''}`}>
                   {item.description || item.rawText || "No additional context available."}
                 </p>
               </div>

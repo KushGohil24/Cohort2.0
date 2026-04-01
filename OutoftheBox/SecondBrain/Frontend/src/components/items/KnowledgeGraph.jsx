@@ -5,6 +5,7 @@ import api from '../../services/api';
 const KnowledgeGraph = ({ onNodeClick }) => {
   const [data, setData] = useState({ nodes: [], links: [] });
   const [loading, setLoading] = useState(true);
+  const [hoverNode, setHoverNode] = useState(null);
   const graphRef = useRef();
 
   useEffect(() => {
@@ -12,6 +13,12 @@ const KnowledgeGraph = ({ onNodeClick }) => {
       try {
         const { data: graphData } = await api.get('/items/graph');
         setData(graphData);
+        // Initial zoom to fit after data settles
+        setTimeout(() => {
+          if (graphRef.current) {
+            graphRef.current.zoomToFit(1000, 150);
+          }
+        }, 300);
       } catch (err) {
         console.error('Failed to fetch graph data', err);
       } finally {
@@ -93,8 +100,9 @@ const KnowledgeGraph = ({ onNodeClick }) => {
           const color = colors[node.type || node.group] || colors.note;
           
           // 1. Draw Glow
+          const isHovered = hoverNode === node;
           ctx.shadowColor = color;
-          ctx.shadowBlur = 15 / globalScale;
+          ctx.shadowBlur = (isHovered ? 25 : 15) / globalScale;
           
           // 2. Draw Circle Background
           ctx.fillStyle = node.group === 'tag' ? 'rgba(129, 140, 248, 0.15)' : 'rgba(15, 23, 42, 0.9)';
@@ -136,6 +144,7 @@ const KnowledgeGraph = ({ onNodeClick }) => {
           ctx.fill();
         }}
         onNodeHover={(node) => {
+          setHoverNode(node);
           if (graphRef.current) {
             const canvas = graphRef.current.getCanvasElement?.();
             if (canvas) {
@@ -145,6 +154,18 @@ const KnowledgeGraph = ({ onNodeClick }) => {
                  canvas.style.cursor = 'grab';
               }
             }
+          }
+        }}
+        onNodeDrag={() => {
+          if (graphRef.current) {
+            const canvas = graphRef.current.getCanvasElement?.();
+            if (canvas) canvas.style.cursor = 'grabbing';
+          }
+        }}
+        onNodeDragEnd={() => {
+          if (graphRef.current) {
+            const canvas = graphRef.current.getCanvasElement?.();
+            if (canvas) canvas.style.cursor = 'grab';
           }
         }}
 
@@ -160,6 +181,20 @@ const KnowledgeGraph = ({ onNodeClick }) => {
             <h3 className="text-xl font-bold text-white tracking-tight">Semantic Galaxy</h3>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Neural Knowledge Mapping</p>
           </div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-6 left-8 flex flex-col gap-2 origin-bottom-left animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-500">
+        <div className="px-4 py-3 bg-slate-900/40 backdrop-blur-xl rounded-xl border border-white/5 flex items-center gap-6 shadow-2xl">
+           <div className="flex items-center gap-2 text-[10px] font-bold text-slate-300 uppercase tracking-tighter">
+              <span className="material-symbols-outlined text-sm text-primary">mouse</span> Drag to Pan
+           </div>
+           <div className="flex items-center gap-2 text-[10px] font-bold text-slate-300 uppercase tracking-tighter">
+              <span className="material-symbols-outlined text-sm text-primary">ads_click</span> Click Node for Details
+           </div>
+           <div className="flex items-center gap-2 text-[10px] font-bold text-slate-300 uppercase tracking-tighter">
+              <span className="material-symbols-outlined text-sm text-primary">pinch</span> Scroll to Zoom
+           </div>
         </div>
       </div>
 

@@ -1,24 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { getCollections } from '../services/api';
 import { Link } from 'react-router-dom';
+import CreateCollectionModal from '../components/collections/CreateCollectionModal';
 
 const Collections = () => {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchCollections = async () => {
+    try {
+      const data = await getCollections();
+      setCollections(data || []);
+    } catch (err) {
+      console.error("Failed to fetch collections", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCollections = async () => {
-      try {
-        const data = await getCollections();
-        setCollections(data);
-      } catch (err) {
-        console.error("Failed to fetch collections", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCollections();
   }, []);
+
+  const handleCreated = (newCollection) => {
+    setCollections(prev => [newCollection, ...prev]);
+  };
 
   if (loading) {
     return (
@@ -30,10 +37,25 @@ const Collections = () => {
 
   return (
     <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <header className="mb-12">
-        <h2 className="text-4xl font-bold font-headline tracking-tight text-white mb-2">My Collections</h2>
-        <p className="text-slate-400 font-body">Curation is the art of meaningful organization.</p>
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/5">
+        <div>
+          <h2 className="text-4xl font-bold font-headline tracking-tight text-white mb-2">My Collections</h2>
+          <p className="text-slate-400 font-body">Curation is the art of meaningful organization.</p>
+        </div>
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 transform active:scale-95 transition-all"
+        >
+          <span className="material-symbols-outlined font-bold">add</span>
+          Create Collection
+        </button>
       </header>
+
+      <CreateCollectionModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onCollectionCreated={handleCreated} 
+      />
 
       {collections.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-20 bg-surface-container-low rounded-2xl border border-dashed border-white/10 text-center">

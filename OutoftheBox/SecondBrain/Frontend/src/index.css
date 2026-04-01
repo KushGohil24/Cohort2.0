@@ -73,6 +73,25 @@
 }
 
 @layer utilities {
+  /* Premium Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(208, 188, 255, 0.1); /* primary-ish with low opacity */
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background-clip: content-box;
+    transition: background 0.3s ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(208, 188, 255, 0.3);
+  }
+
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
@@ -80,12 +99,11 @@
     background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: var(--color-outline-variant);
-    border-radius: 4px;
-    opacity: 0.5;
+    background: rgba(208, 188, 255, 0.15);
+    border-radius: 20px;
   }
   .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-    background: var(--color-outline);
+    background: rgba(208, 188, 255, 0.4);
   }
 
   /* Masonry Grid Utilities */

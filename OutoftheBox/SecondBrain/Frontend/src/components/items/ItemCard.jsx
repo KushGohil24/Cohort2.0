@@ -13,9 +13,15 @@ const ItemCard = ({ item, onDelete, onUpdate }) => {
     const link = item.url || item.fileUrl;
     if (link) {
       navigator.clipboard.writeText(link);
-      toast.success('Link copied to clipboard!');
+      toast.success('Link copied! 📋✨', {
+        style: {
+          background: '#0b1326',
+          color: '#fff',
+          border: '1px solid rgba(99, 102, 241, 0.2)'
+        }
+      });
     } else {
-      toast.error('No link available to share');
+      toast.error('No source link available');
     }
   };
   // Utility for hover actions
@@ -197,10 +203,11 @@ const ItemCard = ({ item, onDelete, onUpdate }) => {
 
     case 'image':
       return (
-        <div className="group relative bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:bg-surface-container-high hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-950/50 flex flex-col h-full">
-          <div className="relative overflow-hidden group flex-1">
+        <div className="group relative bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:bg-surface-container-high hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-950/50 flex flex-col h-full border border-white/5">
+          {renderProcessingOverlay()}
+          <div className="relative overflow-hidden group flex-1 h-full min-h-[240px]">
             <img 
-              className="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-105" 
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
               alt={item.title} 
               src={item.url || item.fileUrl}
             />
