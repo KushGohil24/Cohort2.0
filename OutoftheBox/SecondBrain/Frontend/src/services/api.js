@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // Point to our backend avoiding port 5000 (Airplay receiver collision)
+  baseURL: import.meta.env.PROD ? '/api' : 'http://localhost:8000/api', 
 });
 
 // Interceptor to add JWT token

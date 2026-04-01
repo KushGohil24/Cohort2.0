@@ -2,6 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Routes
 import authRoutes from "./routes/auth.routes.js";
@@ -16,6 +18,9 @@ import "./workers/item.worker.js";
 dotenv.config();
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 // Middlewares
 app.use(cors());
@@ -28,6 +33,16 @@ app.use("/api/items", itemRoutes);
 app.use("/api/collections", collectionRoutes);
 app.use("/api/extract", extractRoutes);
 app.use("/api/upload", uploadRoutes);
+
+// --- Serving Frontend Build ---
+const distPath = path.join(__dirname, "../dist");
+app.use(express.static(distPath));
+
+// Catch-all route for SPA routing (must be last)
+app.use((req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
+});
+
 
 // Database connection & Server start
 const PORT = process.env.PORT || 8000;
