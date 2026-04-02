@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "Backend/src/app.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "Backend/src/app.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "Backend/dist/assets/$1"
+    },
+    {
+      "src": "/favicon.png",
+      "dest": "Backend/dist/favicon.png"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "Backend/dist/index.html"
+    }
+  ]
+}

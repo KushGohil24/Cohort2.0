@@ -51,15 +51,24 @@ const connectDB = async () => {
     const conn = await mongoose.connect(process.env.MONGO_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`Error: ${error.message}`);
-    process.exit(1);
+    console.error(`Database connection failed: ${error.message}`);
+    // Return early instead of process.exit for serverless resilience
+    throw error;
   }
 };
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Vercel handles the server execution; only listen in local/dev environments
+if (!process.env.VERCEL) {
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  }).catch(err => {
+    console.error("Initialization failed", err);
   });
-});
+} else {
+  // On Vercel, we still need to ensure DB is connected
+  connectDB().catch(err => console.error("Serverless DB connection error", err));
+}
 
 export default app;
