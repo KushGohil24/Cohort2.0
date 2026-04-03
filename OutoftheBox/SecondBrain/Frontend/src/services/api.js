@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.PROD ? '/api' : 'http://localhost:8000/api', 
+  // Use a relative path so the browser always targets the CURRENT host (Vercel, local IP, or localhost)
+  baseURL: '/api', 
 });
 
 // Interceptor to add JWT token
