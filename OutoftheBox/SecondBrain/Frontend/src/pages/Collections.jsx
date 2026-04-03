@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getCollections } from '../services/api';
+import { getCollections, deleteCollection } from '../services/api';
 import { Link } from 'react-router-dom';
 import CreateCollectionModal from '../components/collections/CreateCollectionModal';
+import toast from 'react-hot-toast';
 
 const Collections = () => {
   const [collections, setCollections] = useState([]);
@@ -25,6 +26,24 @@ const Collections = () => {
 
   const handleCreated = (newCollection) => {
     setCollections(prev => [newCollection, ...prev]);
+  };
+
+  const handleDelete = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!window.confirm("Are you sure you want to dissolve this collection? The nodes will remain but the organization will be lost.")) {
+      return;
+    }
+
+    try {
+      await deleteCollection(id);
+      setCollections(prev => prev.filter(c => c._id !== id));
+      toast.success('Collection dissolved successfully 🌪️');
+    } catch (err) {
+      console.error("Failed to delete", err);
+      toast.error('Failed to dissolve collection');
+    }
   };
 
   if (loading) {
@@ -83,9 +102,15 @@ const Collections = () => {
                 >
                   {collection.icon || '📁'}
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-white/5 px-2 py-1 rounded">
-                   {collection.itemCount || 0} Items
-                </span>
+                
+                {/* Fixed Deletion Button - Absolute Position to avoid flow issues */}
+                <button 
+                  onClick={(e) => handleDelete(e, collection._id)}
+                  className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-slate-950/40 text-error hover:bg-error hover:text-on-error transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 z-20 backdrop-blur-md border border-white/5 shadow-xl"
+                  title="Dissolve Collection"
+                >
+                  <span className="material-symbols-outlined text-xl">delete</span>
+                </button>
               </div>
 
               <h3 className="text-xl font-headline font-bold text-slate-100 group-hover:text-primary transition-colors mb-2">
@@ -96,7 +121,11 @@ const Collections = () => {
               </p>
 
               <div className="mt-8 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500 font-bold uppercase tracking-tighter">
-                <span>Created {new Date(collection.createdAt).toLocaleDateString()}</span>
+                <div className="flex items-center gap-3">
+                   <span>Created {new Date(collection.createdAt).toLocaleDateString()}</span>
+                   <span className="w-1 h-1 rounded-full bg-slate-700"></span>
+                   <span className="text-primary/70">{collection.itemCount || 0} Nodes</span>
+                </div>
                 <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
               </div>
             </Link>

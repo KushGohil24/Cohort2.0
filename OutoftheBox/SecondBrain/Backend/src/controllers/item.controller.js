@@ -35,34 +35,6 @@ export const createItem = async (req, res) => {
 
     const item = await Item.create({ ...itemData, status: "pending" });
     
-    // Enqueue the async worker OR process synchronously if on Vercel/Serverless
-    if (process.env.VERCEL || process.env.SYNC_AI === 'true') {
-      console.log(`[Vercel/Sync] Direct enrichment for ${item._id}`);
-      try {
-        await enrichItemWithAI(item._id);
-        const enrichedItem = await Item.findById(item._id);
-        return res.status(201).json(enrichedItem || item);
-      } catch (e) {
-        console.error("Synchronous AI enrichment failed", e);
-        return res.status(201).json(item);
-      }
-    } else {
-      try {
-        await itemQueue.add("process-ai", { itemId: item._id }, { jobId: `ai-${item._id}` });
-      } catch (qErr) {
-        console.warn("Queue push failed, attempting fallback sync enrichment", qErr.message);
-        try { 
-          await enrichItemWithAI(item._id); 
-          const enrichedItem = await Item.findById(item._id);
-          return res.status(201).json(enrichedItem || item);
-        } catch (e) {
-          return res.status(201).json(item);
-        }
-      }
-    }
-    
-    res.status(201).json(item);
-
     // Update collection counts if item was added to collections
     if (sanitizedCollectionIds && sanitizedCollectionIds.length > 0) {
       try {
@@ -74,11 +46,36 @@ export const createItem = async (req, res) => {
         console.warn("Collection count update failed", collErr.message);
       }
     }
-    
-    res.status(201).json(item);
+
+    // Enqueue worker or process sync based on environment
+    if (process.env.VERCEL || process.env.SYNC_AI === 'true') {
+      console.log(`[Sync] Direct enrichment for ${item._id}`);
+      try {
+        await enrichItemWithAI(item._id);
+        const enrichedItem = await Item.findById(item._id);
+        return res.status(201).json(enrichedItem || item);
+      } catch (e) {
+        console.error("Sync AI enrichment failed", e);
+        return res.status(201).json(item);
+      }
+    } else {
+      try {
+        await itemQueue.add("process-ai", { itemId: item._id }, { jobId: `ai-${item._id}` });
+      } catch (qErr) {
+        console.warn("Queue failed, trying sync fallback", qErr.message);
+        try { 
+          await enrichItemWithAI(item._id); 
+          const enrichedItem = await Item.findById(item._id);
+          return res.status(201).json(enrichedItem || item);
+        } catch (e) {}
+      }
+      return res.status(201).json(item);
+    }
   } catch (error) {
     console.error("Create Item Error:", error);
-    res.status(500).json({ message: "Failed to create item" });
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Failed to create item" });
+    }
   }
 };
 
@@ -132,10 +129,22 @@ export const updateItem = async (req, res) => {
 
 export const deleteItem = async (req, res) => {
   try {
-    const item = await Item.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    const item = await Item.findOne({ _id: req.params.id, userId: req.user.id });
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
+
+    const collectionIds = item.collectionIds || [];
+    await Item.findByIdAndDelete(item._id);
+
+    // Update collection counts after deletion
+    if (collectionIds.length > 0) {
+      for (const cid of collectionIds) {
+        const count = await Item.countDocuments({ collectionIds: cid });
+        await Collection.findByIdAndUpdate(cid, { itemCount: count });
+      }
+    }
+
     res.json({ message: "Item removed" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });

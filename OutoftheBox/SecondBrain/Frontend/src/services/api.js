@@ -74,4 +74,9 @@ export const createCollection = async (collectionData) => {
   return data;
 };
 
+export const deleteCollection = async (id) => {
+  const { data } = await api.delete(`/collections/${id}`);
+  return data;
+};
+
 export default api;

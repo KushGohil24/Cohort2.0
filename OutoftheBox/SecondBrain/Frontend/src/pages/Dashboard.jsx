@@ -120,7 +120,7 @@ const Dashboard = ({ refreshTrigger, filterFavorites, isArchived }) => {
           </h2>
           <p className="text-slate-400 font-body">
             {debouncedSearch ? `Found ${items.length} relevant neural nodes` : 
-             'Harvested thoughts and curated insights from your digital journey.'}
+             `Curating ${items.length} knowledge nodes in this ${collectionId ? 'collection' : isArchived ? 'archive' : 'sanctuary'}.`}
           </p>
         </div>
         
