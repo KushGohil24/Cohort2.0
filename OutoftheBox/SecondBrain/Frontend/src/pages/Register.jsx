@@ -6,6 +6,9 @@ const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const { registerUser } = useAuth();
   const navigate = useNavigate();
@@ -13,6 +16,12 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match!');
+      return;
+    }
+
     try {
       await registerUser(name, email, password);
       // Wait for auth to redirect to dashboard
@@ -84,14 +93,50 @@ const Register = () => {
                   <span className="material-symbols-outlined text-outline text-lg">lock</span>
                 </div>
                 <input 
-                  className="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-primary/40 focus:bg-surface-container-low rounded-lg py-3.5 pl-11 pr-4 text-on-surface placeholder:text-outline/50 transition-all outline-none" 
+                  className="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-primary/40 focus:bg-surface-container-low rounded-lg py-3.5 pl-11 pr-12 text-on-surface placeholder:text-outline/50 transition-all outline-none" 
                   id="password" 
-                  type="password" 
+                  type={showPassword ? 'text' : 'password'} 
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-outline hover:text-primary transition-colors"
+                >
+                  <span className="material-symbols-outlined text-lg">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="font-label text-xs font-semibold uppercase tracking-widest text-on-surface-variant ml-1" htmlFor="confirmPassword">Confirm Password</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <span className="material-symbols-outlined text-outline text-lg">verified_user</span>
+                </div>
+                <input 
+                  className="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-primary/40 focus:bg-surface-container-low rounded-lg py-3.5 pl-11 pr-12 text-on-surface placeholder:text-outline/50 transition-all outline-none" 
+                  id="confirmPassword" 
+                  type={showConfirmPassword ? 'text' : 'password'} 
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-outline hover:text-primary transition-colors"
+                >
+                  <span className="material-symbols-outlined text-lg">
+                    {showConfirmPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -100,7 +145,7 @@ const Register = () => {
             </button>
           </form>
 
-          <div className="mt-8 pt-8 border-t border-outline-variant/10 text-center">
+          <div className="mt-6 pt-6 border-t border-outline-variant/10 text-center">
             <p className="text-on-surface-variant text-sm">
               Already have an account? 
               <Link to="/login" className="text-primary font-bold hover:underline underline-offset-4 decoration-primary/30 transition-all ml-1">Log in</Link>

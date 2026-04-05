@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -68,14 +69,23 @@ const Login = () => {
                   <span className="material-symbols-outlined text-outline text-lg">lock</span>
                 </div>
                 <input 
-                  className="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-primary/40 focus:bg-surface-container-low rounded-lg py-3.5 pl-11 pr-4 text-on-surface placeholder:text-outline/50 transition-all outline-none" 
+                  className="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-primary/40 focus:bg-surface-container-low rounded-lg py-3.5 pl-11 pr-12 text-on-surface placeholder:text-outline/50 transition-all outline-none" 
                   id="password" 
-                  type="password" 
+                  type={showPassword ? 'text' : 'password'} 
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-outline hover:text-primary transition-colors"
+                >
+                  <span className="material-symbols-outlined text-lg">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
               </div>
             </div>
 
