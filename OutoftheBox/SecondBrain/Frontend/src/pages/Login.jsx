@@ -60,10 +60,7 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between items-center px-1">
-                <label className="font-label text-xs font-semibold uppercase tracking-widest text-on-surface-variant" htmlFor="password">Password</label>
-                <a className="text-xs font-bold text-primary hover:text-primary-fixed-dim transition-colors" href="#">Forgot?</a>
-              </div>
+            
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <span className="material-symbols-outlined text-outline text-lg">lock</span>
