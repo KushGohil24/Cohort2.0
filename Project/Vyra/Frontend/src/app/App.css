@@ -1,0 +1,330 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Vyra Jewelry Design Tokens ===== */
+:root {
+  --vyra-gold: #c9a96e;
+  --vyra-gold-light: #e8d5a3;
+  --vyra-gold-dark: #a8893e;
+  --vyra-dark: #0a0a0a;
+  --vyra-dark-2: #1a1a1a;
+  --vyra-dark-3: #2a2a2a;
+  --vyra-cream: #faf7f2;
+  --vyra-cream-dark: #f0ebe3;
+  --vyra-text: #333333;
+  --vyra-text-light: #777777;
+  --vyra-border: #e0d6c8;
+}
+
+/* ===== Base Styles ===== */
+* {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--vyra-cream);
+  color: var(--vyra-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Typography ===== */
+.vyra-heading {
+  font-family: 'Playfair Display', serif;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+}
+
+/* ===== Active nav link ===== */
+a.active hr {
+  display: block;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--vyra-cream);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--vyra-gold);
+  border-radius: 3px;
+}
+
+/* ===== Utility Classes ===== */
+.gold-gradient {
+  background: linear-gradient(135deg, var(--vyra-gold) 0%, var(--vyra-gold-light) 50%, var(--vyra-gold) 100%);
+}
+
+.gold-text {
+  color: var(--vyra-gold);
+}
+
+.gold-border {
+  border-color: var(--vyra-gold);
+}
+
+/* ===== Buttons (Stitch-inspired ghost-style) ===== */
+.vyra-btn {
+  background-color: transparent;
+  color: var(--vyra-dark);
+  padding: 14px 36px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border: 1px solid var(--vyra-gold);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.vyra-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--vyra-gold) 0%, var(--vyra-gold-dark) 100%);
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.vyra-btn:hover::before {
+  left: 0;
+}
+
+.vyra-btn:hover {
+  color: var(--vyra-dark);
+  border-color: var(--vyra-gold);
+}
+
+.vyra-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.vyra-btn-gold {
+  background: linear-gradient(135deg, var(--vyra-gold) 0%, var(--vyra-gold-dark) 100%);
+  color: var(--vyra-dark);
+  padding: 14px 36px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border: 1px solid var(--vyra-gold);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.vyra-btn-gold:hover {
+  background: linear-gradient(135deg, var(--vyra-gold-dark) 0%, #8a7030 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(201, 169, 110, 0.3);
+}
+
+/* ===== Hero CTA Button ===== */
+.hero-cta-btn {
+  background-color: transparent;
+  color: #faf7f2;
+  padding: 16px 40px;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  border: 1px solid rgba(201, 169, 110, 0.6);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-cta-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #c9a96e 0%, #a8893e 100%);
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.hero-cta-btn:hover::before {
+  left: 0;
+}
+
+.hero-cta-btn:hover {
+  color: #0a0a0a;
+  border-color: #c9a96e;
+  box-shadow: 0 0 30px rgba(201, 169, 110, 0.2);
+}
+
+/* ===== Inputs ===== */
+.vyra-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--vyra-border);
+  background: white;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', sans-serif;
+}
+
+.vyra-input:focus {
+  border-color: var(--vyra-gold);
+}
+
+/* ===== Hero Animations ===== */
+
+/* Fade in up for hero elements */
+.hero-fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: heroFadeIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes heroFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gradient shift for gold text */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 200% center; }
+}
+
+/* Orbital rings — slow, elegant rotation */
+.orbital-ring-1 {
+  animation: orbit1 25s linear infinite;
+}
+.orbital-ring-2 {
+  animation: orbit2 20s linear infinite reverse;
+}
+.orbital-ring-3 {
+  animation: orbit3 30s linear infinite;
+}
+
+@keyframes orbit1 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes orbit2 {
+  from { transform: rotate(0deg) scaleX(0.85); }
+  to { transform: rotate(360deg) scaleX(0.85); }
+}
+@keyframes orbit3 {
+  from { transform: rotate(0deg) scaleY(0.9); }
+  to { transform: rotate(360deg) scaleY(0.9); }
+}
+
+/* Orbiting dots */
+.orbital-dot-1 {
+  animation: dotOrbit1 25s linear infinite;
+}
+.orbital-dot-2 {
+  animation: dotOrbit2 20s linear infinite reverse;
+}
+.orbital-dot-3 {
+  animation: dotOrbit3 15s linear infinite;
+}
+
+@keyframes dotOrbit1 {
+  from { transform: rotate(0deg) translateX(240px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(240px) rotate(-360deg); }
+}
+@keyframes dotOrbit2 {
+  from { transform: rotate(0deg) translateX(180px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
+}
+@keyframes dotOrbit3 {
+  from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+}
+
+/* Diamond floating */
+.diamond-float {
+  animation: diamondFloat 6s ease-in-out infinite;
+}
+@keyframes diamondFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+/* Scroll line pulse */
+.scroll-line {
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.5; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+/* ===== General Animations ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.shimmer-gold {
+  background: linear-gradient(90deg, var(--vyra-gold) 0%, var(--vyra-gold-light) 50%, var(--vyra-gold) 100%);
+  background-size: 200% auto;
+  animation: shimmer 3s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===== Mobile active nav ===== */
+@media (max-width: 640px) {
+  a.active {
+    background-color: var(--vyra-dark);
+    color: var(--vyra-cream);
+  }
+  @keyframes dotOrbit1 {
+    from { transform: rotate(0deg) translateX(160px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(160px) rotate(-360deg); }
+  }
+  @keyframes dotOrbit2 {
+    from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+  }
+  @keyframes dotOrbit3 {
+    from { transform: rotate(0deg) translateX(80px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(80px) rotate(-360deg); }
+  }
+}

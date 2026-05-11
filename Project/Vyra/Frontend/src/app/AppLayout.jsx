@@ -1,0 +1,27 @@
+import React from 'react'
+import Navbar from '../features/Shared/Components/Navbar'
+import Footer from '../features/Shared/Components/Footer'
+import SearchBar from '../features/Shared/Components/SearchBar'
+import { ToastContainer } from 'react-toastify'
+
+export const AppLayout = ({ children }) => {
+  return (
+    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] min-h-screen bg-[#faf7f2]'>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar
+        toastStyle={{
+          backgroundColor: '#0a0a0a',
+          color: '#faf7f2',
+          fontSize: '13px',
+          letterSpacing: '0.5px',
+        }}
+      />
+      <Navbar />
+      <SearchBar />
+      {children}
+      <Footer />
+    </div>
+  )
+}
