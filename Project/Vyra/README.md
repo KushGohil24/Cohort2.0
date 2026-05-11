@@ -1,0 +1,1 @@
+This is e-commerce web-application , here user can buy jewellery.
