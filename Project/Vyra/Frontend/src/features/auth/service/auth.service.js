@@ -34,4 +34,14 @@ export const authService = {
     if (!res.ok) throw new Error(data.message || "Not authenticated");
     return data;
   },
+
+  async logout() {
+    const res = await fetch(`${API_BASE}/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Logout failed");
+    return data;
+  },
 };

@@ -41,7 +41,12 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  logout: () => {
+  logout: async () => {
+    try {
+      await authService.logout();
+    } catch (err) {
+      console.error("Logout error", err);
+    }
     set({ user: null, isAuthenticated: false, error: null });
   },
 }));

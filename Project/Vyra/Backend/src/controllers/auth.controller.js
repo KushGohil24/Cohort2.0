@@ -83,23 +83,48 @@ async function googleCallback(req, res) {
 }
 
 async function getMe(req, res) {
-    const user = req.user;
-
-    res.status(200).json({
-        message: "User fetched successfully",
-        success: true,
-        user: {
-            id: user._id,
-            email: user.email,
-            contact: user.contact,
-            fullname: user.fullname,
-            role: user.role
+    try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ message: "Not authenticated", success: false });
         }
-    })
+
+        const decoded = jwt.verify(token, config.JWT_SECRET);
+        const user = await userModel.findById(decoded.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found", success: false });
+        }
+
+        res.status(200).json({
+            message: "User fetched successfully",
+            success: true,
+            user: {
+                id: user._id,
+                email: user.email,
+                contact: user.contact,
+                fullname: user.fullname,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        res.status(401).json({ message: "Invalid or expired token", success: false });
+    }
 }
+
+async function logout(req, res) {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+    });
+    res.status(200).json({ message: "Logged out successfully", success: true });
+}
+
 export const authController = {
     register,
     login,
     googleCallback,
-    getMe
+    getMe,
+    logout
 };
