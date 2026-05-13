@@ -9,6 +9,7 @@ import Cart from '../features/cart/pages/Cart'
 import Product from '../features/products/pages/Product'
 import PlaceOrder from '../features/cart/pages/PlaceOrder'
 import Orders from '../features/orders/pages/Orders'
+import Profile from '../features/auth/pages/Profile'
 
 export const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ export const AppRoutes = () => {
       <Route path='/about' element={<About />} />
       <Route path='/contact' element={<Contact />} />
       <Route path='/login' element={<Login />} />
+      <Route path='/profile' element={<Profile />} />
       <Route path='/cart' element={<Cart />} />
       <Route path='/product/:productId' element={<Product />} />
       <Route path='/place-order' element={<PlaceOrder />} />

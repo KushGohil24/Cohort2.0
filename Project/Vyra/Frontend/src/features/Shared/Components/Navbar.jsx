@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { ShopContext } from '../../../context/shopContext'
 import { useAuth } from '../../auth/hook/useAuth'
@@ -9,11 +9,25 @@ const Navbar = () => {
   const { setShowSearch, getCartCount } = useContext(ShopContext);
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const profileRef = useRef(null);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className='flex items-center justify-between py-5 font-medium'>
@@ -57,7 +71,7 @@ const Navbar = () => {
         </Link>
 
         {/* Profile / Auth */}
-        <div className='relative'>
+        <div className='relative' ref={profileRef}>
           {isAuthenticated ? (
             <div 
               onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -74,8 +88,9 @@ const Navbar = () => {
             <div className='absolute right-0 pt-4 z-50'>
               <div className='flex flex-col gap-2 w-44 py-4 px-5 bg-white shadow-lg border border-[#e0d6c8] rounded'>
                 <p className='text-xs tracking-wider uppercase text-[#c9a96e] mb-1'>{user?.fullname}</p>
+                <Link onClick={() => setIsProfileOpen(false)} to='/profile' className='cursor-pointer hover:text-[#c9a96e] text-sm transition-colors'>My Profile</Link>
                 <Link onClick={() => setIsProfileOpen(false)} to='/orders' className='cursor-pointer hover:text-[#c9a96e] text-sm transition-colors'>My Orders</Link>
-                <hr className='border-[#e0d6c8]' />
+                <hr className='border-[#e0d6c8] my-1' />
                 <p onClick={() => { setIsProfileOpen(false); handleLogout(); }} className='cursor-pointer hover:text-red-500 text-sm transition-colors'>Logout</p>
               </div>
             </div>
