@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import authRoutes from "./routes/auth.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 const app = express();
 
@@ -28,10 +30,11 @@ passport.use(new GoogleStrategy({
     return done(null, profile);
 }))
 
-import authRoutes from "./routes/auth.routes.js";
 
 app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
 
+// Default route
 app.get("/", (req, res) => {
     res.status(200).json({message:"Server is running"});
 });

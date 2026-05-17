@@ -16,6 +16,15 @@ if(!process.env.GOOGLE_CLIENT_SECRET){
 if(!process.env.GOOGLE_CALLBACK_URL){
     throw new Error("Please provide GOOGLE_CALLBACK_URL");
 }
+if(!process.env.IMAGEKIT_PUBLIC_KEY){
+    throw new Error("Please provide IMAGEKIT_PUBLIC_KEY");
+}
+if(!process.env.IMAGEKIT_PRIVATE_KEY){
+    throw new Error("Please provide IMAGEKIT_PRIVATE_KEY");
+}
+if(!process.env.IMAGEKIT_URL_ENDPOINT){
+    throw new Error("Please provide IMAGEKIT_URL_ENDPOINT");
+}
 export const config = {
     PORT: process.env.PORT || 3000,
     MONGO_URI: process.env.MONGO_URI,
