@@ -3,12 +3,16 @@ import { uploadFile } from "../services/storage.service.js";
 
 async function createProduct(req, res) {
     try {
-        const { name, description, price } = req.body;
+        const { title, description, priceAmount, priceCurrency } = req.body;
         const seller = req.user;
         const images = await Promise.all(req.files.map(async file => {
-            return await uploadFile(file.buffer, file.originalname, seller._id)
+            return await uploadFile({
+                buffer: file.buffer,
+                fileName: file.originalname,
+                folder: seller._id.toString()
+            });
         }));
-        const product = await productModel.create({ name, description, price: { amount: price, currency: "INR" }, images, seller: seller._id });
+        const product = await productModel.create({ title, description, price: { amount: priceAmount, currency: priceCurrency || "INR" }, images, seller: seller._id });
         res.status(201).json({ message: "Product created successfully", success: true, product });
     } catch (error) {
         res.status(500).json({ message: error.message, success: false });

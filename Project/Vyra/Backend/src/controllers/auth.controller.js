@@ -23,7 +23,7 @@ async function sendToken(user, res, message, statusCode) {
 }
 
 async function register(req, res) {
-    const { email, password, contact, fullname, isSeller } = req.body;
+    const { email, password, contact, fullname, role } = req.body;
     try {
         const existingUser = await userModel.findOne({
             $or: [{ email }, { contact }]
@@ -34,8 +34,7 @@ async function register(req, res) {
         }
 
         // save user
-
-        const user = await userModel.create({ email, password, contact, fullname, role: isSeller ? "seller" : "buyer" });
+        const user = await userModel.create({ email, password, contact, fullname, role });
 
         await sendToken(user, res, "User registered successfully", 201)
     } catch (error) {
@@ -48,11 +47,11 @@ async function login(req, res) {
         const { email, password } = req.body;
         const user = await userModel.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "Invalid credentials" });
         }
         const isMatch = await user.comparePassword(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: "Invalid password" });
+            return res.status(401).json({ message: "Invalid credentials" });
         }
         await sendToken(user, res, "User logged in successfully", 200);
     } catch (error) {
