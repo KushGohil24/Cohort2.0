@@ -14,7 +14,11 @@ const ProductItem = ({ id, image, name, price }) => {
         />
       </div>
       <p className='pt-3 pb-1 text-sm text-[#555] group-hover:text-[#c9a96e] transition-colors'>{name}</p>
-      <p className='text-sm font-medium text-[#333]'>{currency}{price}</p>
+      <p className='text-sm font-medium text-[#333]'>
+        {typeof price === 'object' 
+          ? (price.currency === 'INR' ? '₹' : '$') + price.amount 
+          : currency + price}
+      </p>
     </Link>
   )
 }

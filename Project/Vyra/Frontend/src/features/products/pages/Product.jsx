@@ -60,7 +60,11 @@ const Product = () => {
             </svg>
             <p className='pl-2 text-sm text-[#999]'>(122)</p>
           </div>
-          <p className='mt-5 text-3xl vyra-heading text-[#333]'>{currency}{productData.price}</p>
+          <p className='mt-5 text-3xl vyra-heading text-[#333]'>
+            {typeof productData.price === 'object' 
+              ? (productData.price.currency === 'INR' ? '₹' : '$') + productData.price.amount 
+              : currency + productData.price}
+          </p>
           <p className='mt-5 text-[#777] md:w-4/5 text-sm leading-relaxed'>{productData.description}</p>
 
           <div className='flex flex-col gap-4 my-8'>

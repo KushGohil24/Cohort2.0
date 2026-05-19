@@ -15,3 +15,18 @@ export async function createProduct(productData) {
         return { message: "Network error", success: false };
     }
 }
+
+export async function getSellerProducts() {
+    try {
+        const response = await API.get("/products/seller");
+        if (response.data.success) {
+            return response.data;
+        }
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.data) {
+            return error.response.data;
+        }
+        return { message: "Network error", success: false };
+    }
+}

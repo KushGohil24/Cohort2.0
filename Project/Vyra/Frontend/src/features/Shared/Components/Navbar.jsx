@@ -90,6 +90,9 @@ const Navbar = () => {
                 <p className='text-xs tracking-wider uppercase text-[#c9a96e] mb-1'>{user?.fullname}</p>
                 <Link onClick={() => setIsProfileOpen(false)} to='/profile' className='cursor-pointer hover:text-[#c9a96e] text-sm transition-colors'>My Profile</Link>
                 <Link onClick={() => setIsProfileOpen(false)} to='/orders' className='cursor-pointer hover:text-[#c9a96e] text-sm transition-colors'>My Orders</Link>
+                {user?.role === 'seller' && (
+                  <Link onClick={() => setIsProfileOpen(false)} to='/dashboard' className='cursor-pointer hover:text-[#c9a96e] text-sm transition-colors'>Dashboard</Link>
+                )}
                 <hr className='border-[#e0d6c8] my-1' />
                 <p onClick={() => { setIsProfileOpen(false); handleLogout(); }} className='cursor-pointer hover:text-red-500 text-sm transition-colors'>Logout</p>
               </div>

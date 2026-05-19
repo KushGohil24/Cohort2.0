@@ -1,0 +1,22 @@
+import { createProduct, getSellerProducts } from "../service/product.api"
+
+export const useProduct = () => {
+    async function handleCreateProduct(productData){
+        try {
+            const response = await createProduct(productData);
+            return response.product;
+        } catch (error) {
+            throw error;
+        }
+    }
+    async function handleGetSellerProducts(){
+        try {
+            const response = await getSellerProducts();
+            return response.products;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    return { handleCreateProduct, handleGetSellerProducts };
+}
