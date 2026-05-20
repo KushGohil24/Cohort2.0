@@ -13,6 +13,7 @@ import Profile from '../features/auth/pages/Profile'
 import CreateProduct from '../features/products/pages/CreateProduct'
 import SellerProducts from '../features/products/pages/SellerProducts'
 import Dashboard from '../features/products/pages/Dashboard'
+import Protected from '../features/auth/components/Protected'
 
 export const AppRoutes = () => {
   return (
@@ -27,9 +28,23 @@ export const AppRoutes = () => {
       <Route path='/product/:productId' element={<Product />} />
       <Route path='/place-order' element={<PlaceOrder />} />
       <Route path='/orders' element={<Orders />} />
-      <Route path='/create-product' element={<CreateProduct />} />
-      <Route path='/seller-products' element={<SellerProducts />} />
-      <Route path='/dashboard' element={<Dashboard />} />
+      
+      {/* Protected Seller Routes */}
+      <Route path='/create-product' element={
+        <Protected allowedRoles={['seller']}>
+          <CreateProduct />
+        </Protected>
+      } />
+      <Route path='/seller-products' element={
+        <Protected allowedRoles={['seller']}>
+          <SellerProducts />
+        </Protected>
+      } />
+      <Route path='/dashboard' element={
+        <Protected allowedRoles={['seller']}>
+          <Dashboard />
+        </Protected>
+      } />
     </Routes>
   )
 }

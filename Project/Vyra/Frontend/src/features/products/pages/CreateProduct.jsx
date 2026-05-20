@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useProduct } from "../hook/useProduct";
 import Title from "../../Shared/Components/Title";
 import { useNavigate, Link } from "react-router-dom";
@@ -16,14 +16,41 @@ const CreateProduct = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [previews, setPreviews] = useState([]);
+
+    // Manage image preview URLs to avoid memory leaks
+    useEffect(() => {
+        const objectUrls = formData.image.map((file) => URL.createObjectURL(file));
+        setPreviews(objectUrls);
+
+        // Revoke the URLs on unmount or when images change
+        return () => {
+            objectUrls.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [formData.image]);
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
-        if (files.length > 7) {
+        const currentImages = formData.image;
+        const updatedImages = [...currentImages, ...files];
+
+        if (updatedImages.length > 7) {
             setErrors({ ...errors, image: "Maximum 7 images allowed" });
             return;
         }
-        setFormData({ ...formData, image: files });
+
+        setFormData({ ...formData, image: updatedImages });
+        
+        // Clear errors if there are any
+        if (updatedImages.length > 0 && errors.image) {
+            const { image, ...rest } = errors;
+            setErrors(rest);
+        }
+    };
+
+    const handleRemoveImage = (indexToRemove) => {
+        const updatedImages = formData.image.filter((_, index) => index !== indexToRemove);
+        setFormData({ ...formData, image: updatedImages });
     };
 
     const handleChange = (e) => {
@@ -148,6 +175,32 @@ const CreateProduct = () => {
                                     <p className="text-xs text-gray-500 uppercase tracking-widest">PNG, JPG up to 5MB</p>
                                 </div>
                             </div>
+                            
+                            {/* Uploaded Images Preview Grid */}
+                            {previews.length > 0 && (
+                                <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 mt-4">
+                                    {previews.map((url, index) => (
+                                        <div key={url} className="relative aspect-square border border-[#e0d6c8] group overflow-hidden bg-white">
+                                            <img
+                                                src={url}
+                                                alt={`Preview ${index + 1}`}
+                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveImage(index)}
+                                                className="absolute top-1 right-1 bg-black/60 hover:bg-[#c9a96e] text-white hover:text-black rounded-full w-5 h-5 flex items-center justify-center transition-all shadow-sm focus:outline-none"
+                                                title="Remove image"
+                                            >
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
                             <p className="text-gray-500 text-xs mt-2 italic">Maximum 7 images allowed. <span className="font-semibold text-[#c9a96e]">{formData.image.length}</span> selected.</p>
                             {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
                         </div>

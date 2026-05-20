@@ -4,7 +4,7 @@ import { authService } from "../service/auth.service";
 export const useAuthStore = create((set) => ({
   user: null,
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true,
   error: null,
 
   login: async (email, password) => {
