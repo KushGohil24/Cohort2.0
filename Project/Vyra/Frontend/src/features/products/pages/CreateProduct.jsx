@@ -11,8 +11,10 @@ const CreateProduct = () => {
         price: "",
         description: "",
         image: [],
-        category: "",
-        subCategory: "",
+        category: "Necklaces",
+        subCategory: "Gold",
+        sizes: [],
+        bestseller: false,
     });
 
     const [errors, setErrors] = useState({});
@@ -54,8 +56,19 @@ const CreateProduct = () => {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const { name, value, type, checked } = e.target;
+        if (type === "checkbox") {
+            if (name === "bestseller") {
+                setFormData({ ...formData, [name]: checked });
+            } else if (name === "sizes") {
+                const updatedSizes = checked
+                    ? [...formData.sizes, value]
+                    : formData.sizes.filter((s) => s !== value);
+                setFormData({ ...formData, sizes: updatedSizes });
+            }
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -71,6 +84,10 @@ const CreateProduct = () => {
             submitData.append("priceAmount", formData.price);
             submitData.append("priceCurrency", "INR");
             submitData.append("description", formData.description);
+            submitData.append("category", formData.category);
+            submitData.append("subCategory", formData.subCategory);
+            submitData.append("sizes", JSON.stringify(formData.sizes));
+            submitData.append("bestseller", formData.bestseller);
             
             formData.image.forEach((file) => {
                 submitData.append("images", file);
@@ -82,8 +99,10 @@ const CreateProduct = () => {
                 price: "",
                 description: "",
                 image: [],
-                category: "",
-                subCategory: "",
+                category: "Necklaces",
+                subCategory: "Gold",
+                sizes: [],
+                bestseller: false,
             });
             navigate('/seller-products');
         } catch (error) {
@@ -157,6 +176,72 @@ const CreateProduct = () => {
                                 placeholder="Describe the jewelry piece"
                             />
                             {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="category" className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Category</label>
+                                <select
+                                    id="category"
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleChange}
+                                    className="appearance-none block w-full px-4 py-3 border border-[#e0d6c8] text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#c9a96e] focus:border-[#c9a96e] transition-colors sm:text-sm rounded-none cursor-pointer"
+                                >
+                                    <option value="Necklaces">Necklaces</option>
+                                    <option value="Rings">Rings</option>
+                                    <option value="Earrings">Earrings</option>
+                                    <option value="Bracelets">Bracelets</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label htmlFor="subCategory" className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Material (Subcategory)</label>
+                                <select
+                                    id="subCategory"
+                                    name="subCategory"
+                                    value={formData.subCategory}
+                                    onChange={handleChange}
+                                    className="appearance-none block w-full px-4 py-3 border border-[#e0d6c8] text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-[#c9a96e] focus:border-[#c9a96e] transition-colors sm:text-sm rounded-none cursor-pointer"
+                                >
+                                    <option value="Gold">Gold</option>
+                                    <option value="Silver">Silver</option>
+                                    <option value="Diamond">Diamond</option>
+                                    <option value="Platinum">Platinum</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Sizes</label>
+                            <div className="flex gap-4">
+                                {['S', 'M', 'L', 'XL'].map(size => (
+                                    <label key={size} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            name="sizes"
+                                            value={size}
+                                            checked={formData.sizes.includes(size)}
+                                            onChange={handleChange}
+                                            className="w-4 h-4 accent-[#c9a96e]"
+                                        />
+                                        {size}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center">
+                            <label className="flex items-center gap-3 text-sm font-semibold text-gray-700 uppercase tracking-wider cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="bestseller"
+                                    checked={formData.bestseller}
+                                    onChange={handleChange}
+                                    className="w-4 h-4 accent-[#c9a96e]"
+                                />
+                                Add to Bestsellers
+                            </label>
                         </div>
                         
                         <div>

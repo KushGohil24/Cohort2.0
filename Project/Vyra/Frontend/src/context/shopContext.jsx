@@ -1,15 +1,50 @@
 import { createContext, useEffect, useState } from "react";
-import { products } from '../assets/frontend_assets/assets'
+import { products as staticProducts } from '../assets/frontend_assets/assets'
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { getAllProducts } from "../features/products/service/product.api";
+
 export const ShopContext = createContext();
+
 const ShopContextProvider = (props)=>{
     const currency = "$";
     const delivery_fee = 10;
+    const [products, setProducts] = useState([]);
     const [search, setSearch] = useState('');
     const [showSearch, setShowSearch] = useState(false);
     const [cartItems, setCartItems] = useState({});
     const navigate = useNavigate();
+
+    const fetchProducts = async () => {
+        try {
+            const response = await getAllProducts();
+            if (response && response.success) {
+                const mappedProducts = response.products.map(item => ({
+                    _id: item._id,
+                    name: item.title,
+                    description: item.description,
+                    price: item.price,
+                    image: item.images?.map(img => img.url) || [],
+                    category: item.category || 'Necklaces',
+                    subCategory: item.subCategory || 'Gold',
+                    sizes: item.sizes && item.sizes.length > 0 ? item.sizes : ['S', 'M', 'L'],
+                    bestseller: item.bestseller || false
+                }));
+                setProducts(mappedProducts);
+            } else {
+                // Fallback to static products if API call fails or DB is empty
+                setProducts(staticProducts);
+            }
+        } catch (error) {
+            console.error("Error fetching products from DB:", error);
+            setProducts(staticProducts);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
     const addToCart = async(itemId, size)=>{
         if(!size){
             toast.error('Please Select Product Size');
@@ -53,10 +88,12 @@ const ShopContextProvider = (props)=>{
         let totalAmount = 0;
         for(const items in cartItems){
             let itemInfo = products.find((product) => product._id === items);
+            if (!itemInfo) continue;
+            const priceVal = typeof itemInfo.price === 'object' ? itemInfo.price.amount : itemInfo.price;
             for(const item in cartItems[items]){
                 try{
                     if(cartItems[items][item] > 0){
-                        totalAmount += itemInfo.price * cartItems[items][item]
+                        totalAmount += priceVal * cartItems[items][item]
                     }
                 }catch(error){
 
@@ -70,7 +107,7 @@ const ShopContextProvider = (props)=>{
         search, setSearch, showSearch, setShowSearch,
         cartItems, addToCart,
         getCartCount, updateQuantity,
-        getCartAmount, navigate
+        getCartAmount, navigate, fetchProducts
     }
     return (
         <ShopContext.Provider value={value}>

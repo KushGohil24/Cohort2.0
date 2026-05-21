@@ -1,4 +1,4 @@
-import { createProduct, getSellerProducts } from "../service/product.api"
+import { createProduct, getAllProducts, getSellerProducts } from "../service/product.api"
 
 export const useProduct = () => {
     async function handleCreateProduct(productData){
@@ -17,6 +17,13 @@ export const useProduct = () => {
             throw error;
         }
     }
-
-    return { handleCreateProduct, handleGetSellerProducts };
+    async function handleGetAllProducts(){
+        try{
+            const response = await getAllProducts();
+            return response.products;
+        }catch(error){
+            throw error;
+        }
+    }
+    return { handleCreateProduct, handleGetSellerProducts, handleGetAllProducts };
 }

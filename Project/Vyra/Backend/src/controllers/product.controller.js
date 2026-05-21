@@ -3,7 +3,7 @@ import { uploadFile } from "../services/storage.service.js";
 
 async function createProduct(req, res) {
     try {
-        const { title, description, priceAmount, priceCurrency } = req.body;
+        const { title, description, priceAmount, priceCurrency, category, subCategory, sizes, bestseller } = req.body;
         const seller = req.user;
         const images = await Promise.all(req.files.map(async file => {
             return await uploadFile({
@@ -12,7 +12,17 @@ async function createProduct(req, res) {
                 folder: seller._id.toString()
             });
         }));
-        const product = await productModel.create({ title, description, price: { amount: priceAmount, currency: priceCurrency || "INR" }, images, seller: seller._id });
+        const product = await productModel.create({
+            title,
+            description,
+            price: { amount: priceAmount, currency: priceCurrency || "INR" },
+            images,
+            seller: seller._id,
+            category,
+            subCategory,
+            sizes: sizes ? (typeof sizes === 'string' ? JSON.parse(sizes) : sizes) : [],
+            bestseller: bestseller === 'true' || bestseller === true
+        });
         res.status(201).json({ message: "Product created successfully", success: true, product });
     } catch (error) {
         res.status(500).json({ message: error.message, success: false });
@@ -28,7 +38,27 @@ async function getSellerProducts(req, res) {
         res.status(500).json({ message: error.message, success: false });
     }
 }
+
+async function getAllProducts(req, res) {
+    try{
+        const products = await productModel.find({});
+        res.status(200).json({ message: "Products fetched successfully", success: true, products });
+    }catch(error){
+        res.status(500).json({ message: error.message, success: false });
+    }
+}
+
+async function getProduct(req, res) {
+    try{
+        const product = await productModel.findById(req.params.id);
+        res.status(200).json({ message: "Product fetched successfully", success: true, product });
+    }catch(error){
+        res.status(500).json({ message: error.message, success: false });
+    }
+}
 export const productController = {
     createProduct,
-    getSellerProducts
+    getSellerProducts,
+    getAllProducts,
+    getProduct
 };

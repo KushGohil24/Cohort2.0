@@ -2,8 +2,10 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ShopContext } from '../../../context/shopContext'
 import Title from '../../Shared/Components/Title';
 import ProductItem from '../components/ProductItem';
+import { useProduct } from '../hook/useProduct';
 
 const Collection = () => {
+  const { handleGetAllProducts } = useProduct();
   const { products, search, showSearch } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
@@ -57,12 +59,8 @@ const Collection = () => {
   }
 
   useEffect(() => {
-    setFilterProducts(products);
-  }, []);
-
-  useEffect(() => {
     applyFilter();
-  }, [category, subCategory, search, showSearch]);
+  }, [category, subCategory, search, showSearch, products]);
 
   useEffect(() => {
     sortProduct();

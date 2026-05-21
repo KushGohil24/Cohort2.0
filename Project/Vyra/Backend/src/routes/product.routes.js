@@ -24,4 +24,19 @@ router.post('/', authenticateSeller, upload.array('images', 7), productControlle
  * @access Private (Seller only)
  */
 router.get('/seller', authenticateSeller, productController.getSellerProducts);
+
+/**
+ * @route GET '/'
+ * @description Get all products
+ * @access Public
+ */
+router.get('/', productController.getAllProducts);
+
+/**
+ * @route GET '/:id'
+ * @description Get product by id
+ * @access Public
+ */
+router.get('/:id', productController.getProduct);
+
 export default router;
