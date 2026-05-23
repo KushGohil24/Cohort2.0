@@ -53,7 +53,9 @@ const SellerProducts = () => {
                             id={item._id} 
                             image={item.images?.map(img => img.url) || []} 
                             name={item.title} 
-                            price={item.price} 
+                            price={item.price}
+                            metal={item.metal}
+                            stock={item.stock ?? 0}
                         />
                     ))}
                 </div>

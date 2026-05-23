@@ -5,49 +5,68 @@ import RelatedProducts from '../components/RelatedProducts';
 
 const Product = () => {
   const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
-  const [productData, setProductData] = useState(false);
+  const { products, currency, addToCart, cartItems, navigate } = useContext(ShopContext);
+  const [productData, setProductData] = useState(null);
   const [image, setImage] = useState('');
 
-  const fetchProductData = async () => {
-    products.map((item) => {
-      if (item._id === productId) {
-        setProductData(item);
-        setImage(item.image[0])
-        return null;
-      }
-    })
-  }
-
   useEffect(() => {
-    fetchProductData();
-  }, [productId, products])
+    const found = products.find(item => item._id === productId);
+    if (found) {
+      setProductData(found);
+      setImage(found.image[0]);
+    }
+  }, [productId, products]);
 
-  return productData ? (
+  if (!productData) return <div className='opacity-0 min-h-[60vh]' />;
+
+  const priceDisplay = typeof productData.price === 'object'
+    ? (productData.price.currency === 'INR' ? '₹' : '$') + productData.price.amount
+    : currency + productData.price;
+
+  const stock = productData.stock ?? 0;
+  const isOOS = stock === 0;
+  const isLowStock = stock > 0 && stock <= 5;
+  const isInCart = !!cartItems[productData._id];
+
+  return (
     <div className='border-t border-[#e0d6c8] pt-10 transition-opacity ease-in duration-500 opacity-100'>
-      {/* Product data */}
-      <div className='flex gap-12 sm:gap-12 flex-col sm:flex-row'>
-        {/* Product Image */}
+      {/* Product layout */}
+      <div className='flex gap-12 flex-col sm:flex-row'>
+        {/* Image gallery */}
         <div className='flex-1 flex flex-col-reverse gap-3 sm:flex-row'>
           <div className='flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full'>
             {productData.image.map((item, index) => (
               <img
+                key={index}
                 onClick={() => setImage(item)}
                 src={item}
-                key={index}
-                className={`w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer border-2 transition-colors ${item === image ? 'border-[#c9a96e]' : 'border-transparent hover:border-[#e0d6c8]'}`}
-                alt=""
+                className={`w-[24%] sm:w-full aspect-[4/5] object-cover sm:mb-3 flex-shrink-0 cursor-pointer border-2 transition-colors ${item === image ? 'border-[#c9a96e]' : 'border-transparent hover:border-[#e0d6c8]'}`}
+                alt={`${productData.name} view ${index + 1}`}
               />
             ))}
           </div>
-          <div className='w-full sm:w-[80%]'>
-            <img src={image} className='w-full h-auto' alt="" />
+          <div className='w-full sm:w-[80%] relative bg-[#faf7f2]'>
+            <img src={image} className='w-full aspect-[4/5] object-cover' alt={productData.name} />
+            {isOOS && (
+              <div className='absolute inset-0 flex items-center justify-center bg-black/30'>
+                <span className='bg-[#0a0a0a] text-white text-xs tracking-[3px] uppercase px-6 py-3'>Out of Stock</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Product Info */}
         <div className='flex-1'>
           <h1 className='vyra-heading text-2xl mt-2'>{productData.name}</h1>
+
+          {/* Metal / Material badge */}
+          {productData.metal && (
+            <span className='inline-block mt-2 text-[10px] tracking-[2px] uppercase text-[#c9a96e] border border-[#c9a96e]/40 px-2 py-0.5'>
+              {productData.metal}
+            </span>
+          )}
+
+          {/* Star Rating placeholder */}
           <div className='flex items-center gap-1 mt-3'>
             {[...Array(4)].map((_, i) => (
               <svg key={i} className='w-4 h-4 text-[#c9a96e]' fill='currentColor' viewBox='0 0 20 20'>
@@ -59,45 +78,85 @@ const Product = () => {
             </svg>
             <p className='pl-2 text-sm text-[#999]'>(122)</p>
           </div>
-          <p className='mt-5 text-3xl vyra-heading text-[#333]'>
-            {typeof productData.price === 'object' 
-              ? (productData.price.currency === 'INR' ? '₹' : '$') + productData.price.amount 
-              : currency + productData.price}
-          </p>
+
+          {/* Price */}
+          <p className='mt-5 text-3xl vyra-heading text-[#333]'>{priceDisplay}</p>
+
+          {/* Description */}
           <p className='mt-5 text-[#777] md:w-4/5 text-sm leading-relaxed'>{productData.description}</p>
 
-          <button
-            onClick={() => addToCart(productData._id, 'Standard')}
-            className='vyra-btn tracking-[2px] text-xs'
-          >
-            <span>Add to Cart</span>
-          </button>
+          {/* Stock Status */}
+          <div className='mt-5'>
+            {isOOS ? (
+              <span className='text-xs tracking-[2px] uppercase text-red-400 border border-red-300 px-3 py-1'>
+                Out of Stock
+              </span>
+            ) : isLowStock ? (
+              <span className='text-xs tracking-[2px] uppercase text-amber-500 border border-amber-300 px-3 py-1'>
+                Low Stock — Only {stock} left
+              </span>
+            ) : (
+              <span className='text-xs tracking-[2px] uppercase text-green-600 border border-green-300 px-3 py-1'>
+                In Stock
+              </span>
+            )}
+          </div>
+
+          {/* Cart Button */}
+          {isOOS ? (
+            <button
+              disabled
+              className='mt-8 vyra-btn tracking-[2px] text-xs opacity-40 cursor-not-allowed'
+            >
+              <span>Out of Stock</span>
+            </button>
+          ) : isInCart ? (
+            <button
+              onClick={() => navigate('/cart')}
+              className='mt-8 vyra-btn-gold tracking-[2px] text-xs flex items-center gap-2'
+            >
+              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' />
+              </svg>
+              <span>Go to Cart</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => addToCart(productData._id)}
+              className='mt-8 vyra-btn tracking-[2px] text-xs'
+            >
+              <span>Add to Cart</span>
+            </button>
+          )}
 
           <hr className='mt-8 sm:w-4/5 border-[#e0d6c8]' />
+
+          {/* Fashion jewelry trust signals */}
           <div className='text-sm text-[#999] mt-5 flex flex-col gap-1.5'>
-            <p>✦ Premium Quality Craftsmanship</p>
-            <p>✦ Free insured delivery</p>
-            <p>✦ Lifetime exchange guarantee</p>
+            <p>✦ Trendy fashion jewelry</p>
+            <p>✦ Lightweight &amp; comfortable to wear</p>
+            <p>✦ Easy returns within 7 days</p>
+            <p>✦ Secure &amp; fast delivery</p>
           </div>
         </div>
       </div>
 
-      {/* Description & Review Section */}
+      {/* Description & Reviews */}
       <div className='mt-20'>
         <div className='flex'>
           <b className='border border-[#e0d6c8] px-5 py-3 text-sm tracking-wider text-[#c9a96e]'>Description</b>
           <p className='border border-[#e0d6c8] px-5 py-3 text-sm text-[#999]'>Reviews (122)</p>
         </div>
         <div className='flex flex-col gap-4 border border-[#e0d6c8] px-6 py-6 text-sm text-[#777] leading-relaxed'>
-          <p>Every Vyra piece is crafted with meticulous attention to detail, using only the finest materials. Our artisans blend traditional techniques with contemporary design to create jewelry that transcends trends and becomes a cherished part of your story.</p>
-          <p>Each piece undergoes rigorous quality checks to ensure a flawless finish. Our commitment to excellence ensures that your Vyra fashion jewelry will elevate any outfit and bring you joy with every wear.</p>
+          <p>Vyra brings you the latest in fashion jewelry — pieces that are designed to express your style without breaking the bank. Our collection spans bold statement pieces to everyday essentials.</p>
+          <p>Each item is carefully inspected for finish, wearability, and comfort. While our pieces are fashion jewelry and not made of precious metals or real gemstones, they are crafted to look stunning and last long with proper care.</p>
         </div>
       </div>
 
-      {/* Display related products */}
-      <RelatedProducts category={productData.category} subCategory={productData.subCategory} productId={productId} />
+      {/* Related Products */}
+      <RelatedProducts category={productData.category} subCategory={productData.metal} productId={productId} />
     </div>
-  ) : <div className='opacity-0'></div>
-}
+  );
+};
 
-export default Product
+export default Product;

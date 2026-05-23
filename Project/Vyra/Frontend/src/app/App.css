@@ -89,6 +89,7 @@ a.active hr {
   font-weight: 500;
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
 .vyra-btn::before {
@@ -100,11 +101,12 @@ a.active hr {
   height: 100%;
   background: linear-gradient(135deg, var(--vyra-gold) 0%, var(--vyra-gold-dark) 100%);
   transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 0;
+  z-index: -1;
 }
 
 .vyra-btn:hover::before {
   left: 0;
+  z-index: -1;
 }
 
 .vyra-btn:hover {

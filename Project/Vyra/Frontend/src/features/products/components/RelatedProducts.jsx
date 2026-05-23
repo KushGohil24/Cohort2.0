@@ -10,12 +10,14 @@ const RelatedProducts = ({ category, subCategory, productId }) => {
   useEffect(() => {
     if (products.length > 0) {
       let productsCopy = products.slice();
-      productsCopy = productsCopy.filter((item) => category === item.category);
-      productsCopy = productsCopy.filter((item) => subCategory === item.subCategory);
-      productsCopy = productsCopy.filter((item) => item._id !== productId);
+      if (category) productsCopy = productsCopy.filter(item => item.category === category);
+      if (subCategory) productsCopy = productsCopy.filter(item => item.metal === subCategory);
+      productsCopy = productsCopy.filter(item => item._id !== productId);
       setRelated(productsCopy.slice(0, 5));
     }
-  }, [products, category, subCategory, productId])
+  }, [products, category, subCategory, productId]);
+
+  if (related.length === 0) return null;
 
   return (
     <div className='my-24'>
@@ -24,11 +26,11 @@ const RelatedProducts = ({ category, subCategory, productId }) => {
       </div>
       <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6'>
         {related.map((item, index) => (
-          <ProductItem key={index} id={item._id} image={item.image} name={item.name} price={item.price} />
+          <ProductItem key={index} id={item._id} image={item.image} name={item.name} price={item.price} stock={item.stock} metal={item.metal} />
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RelatedProducts
+export default RelatedProducts;
