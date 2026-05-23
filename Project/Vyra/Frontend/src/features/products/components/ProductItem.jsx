@@ -33,9 +33,9 @@ const ProductItem = ({ id, image, name, price, stock, metal }) => {
           </div>
         )}
       </div>
-      <p className='pt-3 pb-0.5 text-sm text-[#555] group-hover:text-[#c9a96e] transition-colors leading-snug'>{name}</p>
+      <p className='pt-3 pb-0.5 text-sm text-[#555] group-hover:text-[#c9a96e] transition-colors leading-snug truncate'>{name}</p>
       {metal && (
-        <p className='text-[10px] text-[#aaa] tracking-wider uppercase mb-1'>{metal}</p>
+        <p className='text-[10px] text-[#aaa] tracking-wider uppercase mb-1 truncate'>{metal}</p>
       )}
       <p className='text-sm font-medium text-[#333]'>{priceDisplay}</p>
     </Link>

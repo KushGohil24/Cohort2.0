@@ -3,7 +3,7 @@ import { ShopContext } from '../../../context/shopContext'
 import Title from '../../Shared/Components/Title'
 
 const Orders = () => {
-  const { products, currency } = useContext(ShopContext);
+  const { products, currency, delivery_fee } = useContext(ShopContext);
 
   return (
     <div className='border-t border-[#e0d6c8] pt-16'>
@@ -11,19 +11,24 @@ const Orders = () => {
         <Title text1={'MY'} text2={'ORDERS'} />
       </div>
       <div>
-        {products.slice(1, 4).map((item, index) => (
-          <div key={index} className='py-4 border-t border-[#e0d6c8] flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
-            <div className='flex items-start gap-6 text-sm'>
-              <img className='w-16 sm:w-20' src={item.image[0]} alt="" />
-              <div>
-                <p className='sm:text-base font-medium text-[#333]'>{item.name}</p>
-                <div className='flex items-center gap-3 mt-2 text-base text-[#555]'>
-                  <p>{currency}{item.price}</p>
-                  <p className='text-[#999]'>Qty: 1</p>
-                  <p className='text-[#999]'>Size: M</p>
-                </div>
+        {products.slice(1, 4).map((item, index) => {
+          const basePrice = typeof item.price === 'object' ? item.price.amount : item.price;
+          const currencySymbol = typeof item.price === 'object' && item.price.currency === 'INR' ? '₹' : currency;
+          const totalPaid = basePrice + delivery_fee;
+
+          return (
+            <div key={index} className='py-4 border-t border-[#e0d6c8] flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+              <div className='flex items-start gap-6 text-sm'>
+                <img className='w-16 sm:w-20' src={item.image[0]} alt="" />
+                <div>
+                  <p className='sm:text-base font-medium text-[#333]'>{item.name}</p>
+                  <div className='flex items-center gap-3 mt-2 text-base text-[#555]'>
+                    <p>{currencySymbol}{totalPaid}</p>
+                    <p className='text-[#999]'>Qty: 1</p>
+                    {item.metal && <p className='text-[#999]'>Metal: {item.metal}</p>}
+                  </div>
                 <p className='mt-2 text-xs text-[#999]'>
-                  Date: <span className='text-[#555]'>May 11, 2026</span>
+                  Date: <span className='text-[#555]'>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                 </p>
               </div>
             </div>
@@ -36,8 +41,9 @@ const Orders = () => {
                 Track Order
               </button>
             </div>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   )
