@@ -212,24 +212,6 @@ const CreateProduct = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Sizes</label>
-                            <div className="flex gap-4">
-                                {['S', 'M', 'L', 'XL'].map(size => (
-                                    <label key={size} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            name="sizes"
-                                            value={size}
-                                            checked={formData.sizes.includes(size)}
-                                            onChange={handleChange}
-                                            className="w-4 h-4 accent-[#c9a96e]"
-                                        />
-                                        {size}
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
 
                         <div className="flex items-center">
                             <label className="flex items-center gap-3 text-sm font-semibold text-gray-700 uppercase tracking-wider cursor-pointer">

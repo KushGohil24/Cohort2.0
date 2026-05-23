@@ -38,8 +38,8 @@ const Cart = () => {
                 <div>
                   <p className='text-sm sm:text-base font-medium text-[#333]'>{productData.name}</p>
                   <div className='flex items-center gap-5 mt-2'>
-                    <p className='text-sm'>{currency}{productData.price}</p>
-                    <p className='px-2 sm:px-3 sm:py-1 border border-[#e0d6c8] bg-white text-xs'>{item.size}</p>
+                    <p className='text-sm'>{currency}{typeof productData.price === 'object' ? productData.price.amount : productData.price}</p>
+                    {item.size !== 'Standard' && <p className='px-2 sm:px-3 sm:py-1 border border-[#e0d6c8] bg-white text-xs'>{item.size}</p>}
                   </div>
                 </div>
               </div>

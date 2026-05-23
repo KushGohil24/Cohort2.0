@@ -8,7 +8,6 @@ const Product = () => {
   const { products, currency, addToCart } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState('');
-  const [size, setSize] = useState('');
 
   const fetchProductData = async () => {
     products.map((item) => {
@@ -67,26 +66,8 @@ const Product = () => {
           </p>
           <p className='mt-5 text-[#777] md:w-4/5 text-sm leading-relaxed'>{productData.description}</p>
 
-          <div className='flex flex-col gap-4 my-8'>
-            <p className='text-xs tracking-[2px] uppercase text-[#c9a96e]'>Select Size</p>
-            <div className='flex gap-2'>
-              {productData.sizes.map((item, index) => (
-                <button
-                  onClick={() => setSize(item)}
-                  className={`border py-2 px-4 text-sm transition-all duration-200 ${item === size
-                    ? 'border-[#c9a96e] bg-[#c9a96e]/10 text-[#c9a96e]'
-                    : 'border-[#e0d6c8] hover:border-[#c9a96e] bg-white'
-                  }`}
-                  key={index}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <button
-            onClick={() => addToCart(productData._id, size)}
+            onClick={() => addToCart(productData._id, 'Standard')}
             className='vyra-btn tracking-[2px] text-xs'
           >
             <span>Add to Cart</span>

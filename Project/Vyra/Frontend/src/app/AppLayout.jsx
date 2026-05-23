@@ -3,6 +3,7 @@ import Navbar from '../features/Shared/Components/Navbar'
 import Footer from '../features/Shared/Components/Footer'
 import SearchBar from '../features/Shared/Components/SearchBar'
 import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 export const AppLayout = ({ children }) => {
   return (
