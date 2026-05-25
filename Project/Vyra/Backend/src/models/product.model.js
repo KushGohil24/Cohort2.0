@@ -102,6 +102,6 @@ const productSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-export { METALS, CATEGORIES };
+export { METALS, CATEGORIES, priceSchema };
 const productModel = mongoose.model("product", productSchema);
 export default productModel;
