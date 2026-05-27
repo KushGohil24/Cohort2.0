@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom'
 import { ShopContext } from '../../../context/shopContext';
 import RelatedProducts from '../components/RelatedProducts';
 import { useCart } from '../../cart/hook/useCart';
+import { useAuth } from '../../auth/hook/useAuth';
+import { useProduct } from '../hook/useProduct';
 
 const Product = () => {
   const { productId } = useParams();
@@ -10,6 +12,51 @@ const Product = () => {
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState('');
   const { handleAddToCart } = useCart();
+  
+  const { user } = useAuth();
+  const { handleAddVariant } = useProduct();
+  const [showVariantForm, setShowVariantForm] = useState(false);
+  const [variantFormData, setVariantFormData] = useState({
+    stock: '', priceAmount: '', attributes: ''
+  });
+  const [variantImages, setVariantImages] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const onVariantSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    const fd = new FormData();
+    fd.append('stock', variantFormData.stock);
+    fd.append('priceAmount', variantFormData.priceAmount);
+    
+    // Parse attributes from key:value,key2:value2 format to JSON object if needed, or pass as string
+    const attrsObj = {};
+    if (variantFormData.attributes) {
+      variantFormData.attributes.split(',').forEach(pair => {
+        const [k, v] = pair.split(':').map(s => s.trim());
+        if (k && v) attrsObj[k] = v;
+      });
+    }
+    fd.append('attributes', JSON.stringify(attrsObj));
+
+    for (let i = 0; i < variantImages.length; i++) {
+        fd.append('images', variantImages[i]);
+    }
+    
+    try {
+        const updatedProduct = await handleAddVariant(productId, fd);
+        setProductData(updatedProduct);
+        setShowVariantForm(false);
+        setVariantFormData({ stock: '', priceAmount: '', attributes: '' });
+        setVariantImages([]);
+        alert("Variant added successfully!");
+    } catch (err) {
+        alert("Error adding variant: " + err.message);
+    } finally {
+        setIsSubmitting(false);
+    }
+  }
+
   useEffect(() => {
     const found = products.find(item => item._id === productId);
     if (found) {
@@ -155,6 +202,83 @@ const Product = () => {
           <p>Each item is carefully inspected for finish, wearability, and comfort. While our pieces are fashion jewelry and not made of precious metals or real gemstones, they are crafted to look stunning and last long with proper care.</p>
         </div>
       </div>
+
+      {/* Seller Administration */}
+      {user?._id === productData.seller && (
+        <div className='mt-20 border-2 border-dashed border-[#c9a96e] p-6 bg-[#faf7f2]'>
+          <div className='flex justify-between items-center mb-6'>
+            <h2 className='text-xl vyra-heading text-[#0a0a0a]'>Seller Administration</h2>
+            <button 
+              onClick={() => setShowVariantForm(!showVariantForm)}
+              className='bg-[#0a0a0a] text-white px-4 py-2 text-xs uppercase tracking-widest'
+            >
+              {showVariantForm ? 'Cancel' : 'Add New Variant'}
+            </button>
+          </div>
+          
+          {showVariantForm && (
+            <form onSubmit={onVariantSubmit} className='flex flex-col gap-4 mt-6 border-t border-[#e0d6c8] pt-6'>
+              <h3 className='text-sm font-semibold text-[#333] tracking-widest uppercase'>Variant Details</h3>
+              
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div className='flex flex-col gap-1'>
+                  <label className='text-xs text-[#777] uppercase tracking-wider'>Stock Quantity</label>
+                  <input 
+                    type='number' 
+                    required 
+                    min='0'
+                    value={variantFormData.stock}
+                    onChange={(e) => setVariantFormData({...variantFormData, stock: e.target.value})}
+                    className='border border-[#e0d6c8] px-3 py-2 text-sm focus:outline-none focus:border-[#c9a96e]'
+                  />
+                </div>
+                <div className='flex flex-col gap-1'>
+                  <label className='text-xs text-[#777] uppercase tracking-wider'>Price (Amount)</label>
+                  <input 
+                    type='number' 
+                    required 
+                    min='0'
+                    value={variantFormData.priceAmount}
+                    onChange={(e) => setVariantFormData({...variantFormData, priceAmount: e.target.value})}
+                    className='border border-[#e0d6c8] px-3 py-2 text-sm focus:outline-none focus:border-[#c9a96e]'
+                  />
+                </div>
+              </div>
+              
+              <div className='flex flex-col gap-1'>
+                <label className='text-xs text-[#777] uppercase tracking-wider'>Attributes (e.g. Size:M, Color:Red)</label>
+                <input 
+                  type='text'
+                  placeholder='Size:M, Color:Red'
+                  value={variantFormData.attributes}
+                  onChange={(e) => setVariantFormData({...variantFormData, attributes: e.target.value})}
+                  className='border border-[#e0d6c8] px-3 py-2 text-sm focus:outline-none focus:border-[#c9a96e]'
+                />
+              </div>
+
+              <div className='flex flex-col gap-1'>
+                <label className='text-xs text-[#777] uppercase tracking-wider'>Variant Images (up to 5)</label>
+                <input 
+                  type='file' 
+                  multiple 
+                  accept='image/*'
+                  required
+                  onChange={(e) => setVariantImages(e.target.files)}
+                  className='border border-[#e0d6c8] px-3 py-2 text-sm focus:outline-none focus:border-[#c9a96e] file:mr-4 file:py-2 file:px-4 file:border-0 file:text-xs file:font-semibold file:bg-[#e0d6c8] file:text-[#333] hover:file:bg-[#c9a96e]'
+                />
+              </div>
+
+              <button 
+                type='submit' 
+                disabled={isSubmitting}
+                className='mt-4 bg-[#c9a96e] hover:bg-[#a8893e] text-[#0a0a0a] py-3 text-xs uppercase tracking-[2px] font-bold transition-colors disabled:opacity-50'
+              >
+                {isSubmitting ? 'Saving...' : 'Save Variant'}
+              </button>
+            </form>
+          )}
+        </div>
+      )}
 
       {/* Related Products */}
       <RelatedProducts category={productData.category} subCategory={productData.metal} productId={productId} />

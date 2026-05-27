@@ -1,4 +1,4 @@
-import { createProduct, getAllProducts, getSellerProducts } from "../service/product.api"
+import { createProduct, getAllProducts, getSellerProducts, addVariant } from "../service/product.api"
 
 export const useProduct = () => {
     async function handleCreateProduct(productData){
@@ -25,5 +25,14 @@ export const useProduct = () => {
             throw error;
         }
     }
-    return { handleCreateProduct, handleGetSellerProducts, handleGetAllProducts };
+    async function handleAddVariant(productId, formData){
+        try{
+            const response = await addVariant(productId, formData);
+            if (!response.success) throw new Error(response.message);
+            return response.product;
+        }catch(error){
+            throw error;
+        }
+    }
+    return { handleCreateProduct, handleGetSellerProducts, handleGetAllProducts, handleAddVariant };
 }

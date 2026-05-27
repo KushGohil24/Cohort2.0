@@ -75,9 +75,60 @@ async function getProduct(req, res) {
     }
 }
 
+async function addVariant(req, res) {
+    try {
+        const productId = req.params.id;
+        const seller = req.user;
+        const { priceAmount, priceCurrency, stock, attributes } = req.body;
+
+        const product = await productModel.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found", success: false });
+        }
+
+        if (product.seller.toString() !== seller._id.toString()) {
+            return res.status(403).json({ message: "Unauthorized to modify this product", success: false });
+        }
+
+        const images = await Promise.all(req.files.map(async file => {
+            return {
+                url: await uploadFile({
+                    buffer: file.buffer,
+                    fileName: file.originalname,
+                    folder: seller._id.toString()
+                })
+            };
+        }));
+
+        let parsedAttributes = {};
+        if (attributes) {
+            try {
+                parsedAttributes = typeof attributes === 'string' ? JSON.parse(attributes) : attributes;
+            } catch (e) {
+                // Ignore parse error
+            }
+        }
+
+        const newVariant = {
+            images,
+            stock: stock !== undefined ? Number(stock) : 0,
+            price: { amount: Number(priceAmount), currency: priceCurrency || "INR" },
+            attributes: parsedAttributes
+        };
+
+        product.variants.push(newVariant);
+        await product.save();
+
+        res.status(201).json({ message: "Variant added successfully", success: true, product });
+    } catch (error) {
+        res.status(500).json({ message: error.message, success: false });
+    }
+}
+
 export const productController = {
     createProduct,
     getSellerProducts,
     getAllProducts,
-    getProduct
+    getProduct,
+    addVariant
 };

@@ -45,3 +45,19 @@ export async function getAllProducts() {
         return { message: "Network error", success: false };
     }
 }
+
+export async function addVariant(productId, formData) {
+    try {
+        const response = await API.post(`/products/${productId}/variants`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.data) {
+            return error.response.data;
+        }
+        return { message: "Network error", success: false };
+    }
+}
