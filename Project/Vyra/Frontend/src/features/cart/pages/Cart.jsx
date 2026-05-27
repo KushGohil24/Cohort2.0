@@ -8,9 +8,12 @@ const Cart = () => {
   const [cartData, setCartData] = useState([]);
 
   useEffect(() => {
-    const tempData = Object.entries(cartItems)
-      .filter(([, qty]) => qty > 0)
-      .map(([id, qty]) => ({ _id: id, quantity: qty }));
+    const tempData = cartItems.map(item => ({
+      _id: item.product?._id || item.product,
+      variantId: item.variant,
+      quantity: item.quantity,
+      price: item.price
+    }));
     setCartData(tempData);
   }, [cartItems]);
 
@@ -48,12 +51,14 @@ const Cart = () => {
           const productData = products.find(p => p._id === item._id);
           if (!productData) return null;
 
-          const priceVal = typeof productData.price === 'object'
-            ? productData.price.amount
-            : productData.price;
-          const priceDisplay = typeof productData.price === 'object'
-            ? (productData.price.currency === 'INR' ? '₹' : '$') + productData.price.amount
-            : currency + productData.price;
+          const priceVal = typeof item.price === 'object'
+            ? item.price.amount
+            : (typeof productData.price === 'object' ? productData.price.amount : productData.price);
+            
+          const priceDisplay = typeof item.price === 'object'
+            ? (item.price.currency === 'INR' ? '₹' : '$') + item.price.amount
+            : (typeof productData.price === 'object' ? (productData.price.currency === 'INR' ? '₹' : '$') + productData.price.amount : currency + productData.price);
+            
           const lineTotal = priceVal * item.quantity;
 
           return (
@@ -79,7 +84,7 @@ const Cart = () => {
                   <div className='flex items-center gap-0 mt-3'>
                     {/* Minus */}
                     <button
-                      onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                      onClick={() => updateQuantity(item._id, item.variantId, item.quantity, item.quantity - 1)}
                       disabled={item.quantity <= 1}
                       className='w-8 h-8 flex items-center justify-center border border-[#e0d6c8] text-[#555] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:bg-[#faf7f2]'
                       aria-label='Decrease quantity'
@@ -96,7 +101,7 @@ const Cart = () => {
 
                     {/* Plus */}
                     <button
-                      onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                      onClick={() => updateQuantity(item._id, item.variantId, item.quantity, item.quantity + 1)}
                       className='w-8 h-8 flex items-center justify-center border border-[#e0d6c8] text-[#555] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors active:bg-[#faf7f2]'
                       aria-label='Increase quantity'
                     >
@@ -110,10 +115,10 @@ const Cart = () => {
                 {/* Right side: Line Total + Remove */}
                 <div className='flex flex-col items-end gap-2 flex-shrink-0'>
                   <p className='text-sm font-semibold text-[#333]'>
-                    {typeof productData.price === 'object' && productData.price.currency === 'INR' ? '₹' : currency}{lineTotal}
+                    {typeof item.price === 'object' && item.price.currency === 'INR' ? '₹' : currency}{lineTotal}
                   </p>
                   <button
-                    onClick={() => updateQuantity(item._id, 0)}
+                    onClick={() => updateQuantity(item._id, item.variantId, item.quantity, 0)}
                     className='text-[#bbb] hover:text-red-400 transition-colors p-1'
                     aria-label='Remove item'
                     title='Remove'

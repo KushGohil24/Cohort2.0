@@ -13,11 +13,11 @@ export const validateAddToCart = [
         .notEmpty().withMessage("Product ID is required")
         .isMongoId().withMessage("Product ID is invalid"),
     param("variantId")
-        .notEmpty().withMessage("Variant ID is required")
+        .optional()
         .isMongoId().withMessage("Variant ID is invalid"),
     body("quantity")
         .optional()
-        .isInt({ gt: 0 }).withMessage("Quantity must be greater than 0")
+        .isInt().withMessage("Quantity must be a valid integer")
         .toInt(),
     validateRequest
 ]

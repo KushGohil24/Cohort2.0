@@ -2,13 +2,14 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ShopContext } from '../../../context/shopContext';
 import RelatedProducts from '../components/RelatedProducts';
+import { useCart } from '../../cart/hook/useCart';
 
 const Product = () => {
   const { productId } = useParams();
   const { products, currency, addToCart, cartItems, navigate } = useContext(ShopContext);
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState('');
-
+  const { handleAddToCart } = useCart();
   useEffect(() => {
     const found = products.find(item => item._id === productId);
     if (found) {
@@ -26,7 +27,9 @@ const Product = () => {
   const stock = productData.stock ?? 0;
   const isOOS = stock === 0;
   const isLowStock = stock > 0 && stock <= 5;
-  const isInCart = !!cartItems[productData._id];
+  const isInCart = cartItems.some(item => 
+    (item.product?._id || item.product) === productData._id
+  );
 
   return (
     <div className='border-t border-[#e0d6c8] pt-10 transition-opacity ease-in duration-500 opacity-100'>

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getSellerProducts } from "../service/product.api";
 
-const initialState = {
+const productSlice = createSlice({
     name: "product",
     initialState : {
         sellerProducts: [],
@@ -15,7 +15,7 @@ const initialState = {
             state.products = action.payload;
         }
     }
-}
+})
 
 export const { setSellerProducts, setProducts } = productSlice.actions;
 export default productSlice.reducer;

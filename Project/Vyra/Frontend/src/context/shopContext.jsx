@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { getAllProducts } from "../features/products/service/product.api";
+import { useCart } from "../features/cart/hook/useCart";
 
 export const ShopContext = createContext();
 
@@ -11,9 +12,9 @@ const ShopContextProvider = (props) => {
     const [products, setProducts] = useState([]);
     const [search, setSearch] = useState('');
     const [showSearch, setShowSearch] = useState(false);
-    // Flat cart: { itemId: quantity }
-    const [cartItems, setCartItems] = useState({});
     const navigate = useNavigate();
+
+    const { cartItems, handleAddToCart, handleGetCart, handleUpdateQuantity } = useCart();
 
     const fetchProducts = async () => {
         try {
@@ -44,50 +45,32 @@ const ShopContextProvider = (props) => {
 
     useEffect(() => {
         fetchProducts();
+        handleGetCart();
     }, []);
 
-    const addToCart = (itemId) => {
-        const product = products.find(p => p._id === itemId);
-        if (!product) return;
-
-        if (product.stock === 0) {
-            toast.error("This item is out of stock.");
-            return;
+    const addToCart = async (itemId, variantId = null) => {
+        if (!variantId) {
+            const product = products.find(p => p._id === itemId);
+            if (product && product.variants && product.variants.length > 0) {
+                variantId = product.variants[0]._id;
+            }
         }
-
-        setCartItems(prev => ({
-            ...prev,
-            [itemId]: (prev[itemId] || 0) + 1
-        }));
-
-        toast.success(`Added "${product.name}" to cart!`);
+        await handleAddToCart(itemId, variantId, 1);
     };
 
     const getCartCount = () => {
-        return Object.values(cartItems).reduce((acc, qty) => acc + qty, 0);
+        return cartItems.reduce((total, item) => total + item.quantity, 0);
     };
 
-    const updateQuantity = (itemId, quantity) => {
-        if (quantity <= 0) {
-            setCartItems(prev => {
-                const updated = { ...prev };
-                delete updated[itemId];
-                return updated;
-            });
-        } else {
-            setCartItems(prev => ({ ...prev, [itemId]: quantity }));
-        }
+    const updateQuantity = async (itemId, variantId, currentQuantity, newQuantity) => {
+        await handleUpdateQuantity(itemId, variantId, currentQuantity, newQuantity);
     };
 
     const getCartAmount = () => {
-        let totalAmount = 0;
-        for (const itemId in cartItems) {
-            const product = products.find(p => p._id === itemId);
-            if (!product) continue;
-            const priceVal = typeof product.price === 'object' ? product.price.amount : product.price;
-            totalAmount += priceVal * cartItems[itemId];
-        }
-        return totalAmount;
+        return cartItems.reduce((total, item) => {
+            const priceVal = typeof item.price === 'object' ? item.price.amount : item.price;
+            return total + (priceVal * item.quantity);
+        }, 0);
     };
 
     const value = {
