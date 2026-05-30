@@ -3,6 +3,10 @@ import { useProduct } from "../hook/useProduct";
 import Title from "../../Shared/Components/Title";
 import { useNavigate, Link } from "react-router-dom";
 
+// Helper icons
+const PlusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
+const TrashIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>;
+
 const CATEGORIES = [
     'Necklaces', 'Rings', 'Earrings', 'Bracelets', 'Anklets', 'Bangles',
     'Pendants', 'Chains', 'Nose Pins', 'Hair Accessories', 'Brooches', 'Sets'
@@ -27,12 +31,23 @@ const INITIAL_FORM = {
 };
 
 const CreateProduct = () => {
-    const { handleCreateProduct } = useProduct();
+    const { handleCreateProduct, handleAddVariant } = useProduct();
     const navigate = useNavigate();
     const [formData, setFormData] = useState(INITIAL_FORM);
     const [errors, setErrors] = useState({});
     const [previews, setPreviews] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Variant states
+    const [variants, setVariants] = useState([]);
+    const [isAddingVariant, setIsAddingVariant] = useState(false);
+    const [attributeInputs, setAttributeInputs] = useState([ { key: '', value: '' } ]);
+    const [newVariant, setNewVariant] = useState({
+        images: [],
+        stock: 0,
+        attributes: {},
+        price: { amount: '', currency: 'INR' }
+    });
 
     // Image preview URLs
     useEffect(() => {
@@ -74,6 +89,100 @@ const CreateProduct = () => {
         return errs;
     };
 
+    // Handlers for New Variant Form
+    const handleAddNewVariant = () => {
+        const hasValidAttribute = attributeInputs.some(attr => attr.key.trim() && attr.value.trim());
+        if (!hasValidAttribute) {
+            alert("At least one valid attribute is required.");
+            return;
+        }
+
+        const cleanImages = newVariant.images.map(img => ({ url: img.previewUrl, file: img.file }));
+        const cleanAttributes = { ...newVariant.attributes };
+
+        const variantToSave = {
+            images: cleanImages,
+            stock: Number(newVariant.stock),
+            attributes: cleanAttributes,
+            price: newVariant.price.amount ? { amount: Number(newVariant.price.amount), currency: newVariant.price.currency } : null
+        };
+
+        setVariants([...variants, variantToSave]);
+        setIsAddingVariant(false);
+
+        setAttributeInputs([ { key: '', value: '' } ]);
+        setNewVariant({
+            images: [],
+            stock: 0,
+            attributes: {},
+            price: { amount: '', currency: 'INR' }
+        });
+    };
+
+    const handleAddAttribute = () => {
+        setAttributeInputs(prev => [ ...prev, { key: '', value: '' } ]);
+    };
+
+    const handleAttributeChange = (index, field, value) => {
+        const updatedInputs = [ ...attributeInputs ];
+        updatedInputs[ index ][ field ] = value;
+        setAttributeInputs(updatedInputs);
+
+        const newAttrsObj = {};
+        updatedInputs.forEach(attr => {
+            if (attr.key.trim() !== '') {
+                newAttrsObj[ attr.key.trim() ] = attr.value;
+            }
+        });
+        setNewVariant(prev => ({ ...prev, attributes: newAttrsObj }));
+    };
+
+    const handleRemoveAttribute = (index) => {
+        const updatedInputs = attributeInputs.filter((_, i) => i !== index);
+        setAttributeInputs(updatedInputs);
+
+        const newAttrsObj = {};
+        updatedInputs.forEach(attr => {
+            if (attr.key.trim() !== '') {
+                newAttrsObj[ attr.key.trim() ] = attr.value;
+            }
+        });
+        setNewVariant(prev => ({ ...prev, attributes: newAttrsObj }));
+    };
+
+    const handleVariantImageUpload = (e) => {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+
+        const availableSlots = 7 - newVariant.images.length;
+        const filesToAdd = files.slice(0, availableSlots);
+
+        if (files.length > availableSlots) {
+            alert(`You can only upload up to 7 images. ${filesToAdd.length} added.`);
+        }
+
+        const newImageObjects = filesToAdd.map(file => ({
+            file,
+            previewUrl: URL.createObjectURL(file)
+        }));
+
+        setNewVariant(prev => ({
+            ...prev,
+            images: [ ...prev.images, ...newImageObjects ]
+        }));
+
+        e.target.value = '';
+    };
+
+    const handleRemoveVariantImage = (index) => {
+        const imageToRemove = newVariant.images[ index ];
+        if (imageToRemove?.previewUrl) {
+            URL.revokeObjectURL(imageToRemove.previewUrl);
+        }
+        const updatedImages = newVariant.images.filter((_, i) => i !== index);
+        setNewVariant(prev => ({ ...prev, images: updatedImages }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const errs = validate(formData);
@@ -92,8 +201,27 @@ const CreateProduct = () => {
             submitData.append("bestseller", formData.bestseller);
             formData.image.forEach(file => submitData.append("images", file));
 
-            await handleCreateProduct(submitData);
+            // Create base product
+            const product = await handleCreateProduct(submitData);
+
+            // If variants exist, upload them
+            if (product && product._id && variants.length > 0) {
+                for (const variant of variants) {
+                    const variantData = new FormData();
+                    variantData.append("stock", variant.stock);
+                    if (variant.price?.amount) {
+                        variantData.append("priceAmount", variant.price.amount);
+                        variantData.append("priceCurrency", variant.price.currency);
+                    }
+                    variantData.append("attributes", JSON.stringify(variant.attributes));
+                    variant.images.forEach(img => variantData.append("images", img.file));
+
+                    await handleAddVariant(product._id, variantData);
+                }
+            }
+
             setFormData(INITIAL_FORM);
+            setVariants([]);
             navigate('/seller-products');
         } catch (error) {
             console.error("Error creating product:", error);
@@ -133,12 +261,12 @@ const CreateProduct = () => {
                     {/* Price + Stock row */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="price" className={labelCls}>Price (₹ INR)</label>
+                            <label htmlFor="price" className={labelCls}>Base Price (₹ INR)</label>
                             <input id="price" name="price" type="number" min="1" value={formData.price} onChange={handleChange} className={inputCls} placeholder="0" />
                             {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
                         </div>
                         <div>
-                            <label htmlFor="stock" className={labelCls}>Stock Quantity</label>
+                            <label htmlFor="stock" className={labelCls}>Initial Stock (Default Variant)</label>
                             <input id="stock" name="stock" type="number" min="0" value={formData.stock} onChange={handleChange} className={inputCls} placeholder="0" />
                             {errors.stock && <p className="text-red-500 text-xs mt-1">{errors.stock}</p>}
                         </div>
@@ -213,9 +341,107 @@ const CreateProduct = () => {
                         {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
                     </div>
 
-                    <div className="pt-2">
+                    <hr className="my-8 border-[#e0d6c8]" />
+
+                    {/* Variants Section */}
+                    <div>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-serif text-xl text-[#0a0a0a]">Product Variants (Optional)</h3>
+                            {!isAddingVariant && (
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddingVariant(true)}
+                                    className="text-sm font-semibold text-[#c9a96e] hover:text-[#a8893e] uppercase tracking-wider flex items-center gap-1"
+                                >
+                                    <PlusIcon /> Add Variant
+                                </button>
+                            )}
+                        </div>
+
+                        {variants.length > 0 && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                                {variants.map((v, i) => (
+                                    <div key={i} className="border border-[#e0d6c8] p-4 bg-gray-50 flex gap-4">
+                                        <div className="w-16 h-16 bg-white border border-[#e0d6c8]">
+                                            {v.images.length > 0 && <img src={v.images[0].url} alt="Variant" className="w-full h-full object-cover" />}
+                                        </div>
+                                        <div>
+                                            <div className="flex flex-wrap gap-1 mb-1">
+                                                {Object.entries(v.attributes).map(([key, val]) => (
+                                                    <span key={key} className="bg-white border border-[#e0d6c8] px-2 py-0.5 text-xs text-gray-700">
+                                                        {key}: {val}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <p className="text-sm text-gray-600">Stock: {v.stock}</p>
+                                            {v.price && <p className="text-sm text-[#c9a96e]">₹{v.price.amount}</p>}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {isAddingVariant && (
+                            <div className="bg-gray-50 p-6 border border-[#e0d6c8]">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h4 className="font-serif text-lg">New Variant</h4>
+                                    <button type="button" onClick={() => setIsAddingVariant(false)} className="text-gray-500 hover:text-gray-800 text-xs uppercase tracking-wider">Cancel</button>
+                                </div>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Attributes (e.g. Size, Color) *</label>
+                                        <div className="space-y-2">
+                                            {attributeInputs.map((attr, index) => (
+                                                <div key={index} className="flex gap-2">
+                                                    <input type="text" placeholder="Key (e.g. Size)" value={attr.key} onChange={(e) => handleAttributeChange(index, 'key', e.target.value)} className={inputCls} />
+                                                    <input type="text" placeholder="Value (e.g. M)" value={attr.value} onChange={(e) => handleAttributeChange(index, 'value', e.target.value)} className={inputCls} />
+                                                    {attributeInputs.length > 1 && (
+                                                        <button type="button" onClick={() => handleRemoveAttribute(index)} className="px-3 text-red-500 hover:bg-red-50 border border-transparent hover:border-red-200">
+                                                            <TrashIcon />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <button type="button" onClick={handleAddAttribute} className="mt-2 text-xs font-semibold text-[#c9a96e] hover:text-[#a8893e] uppercase tracking-wider flex items-center gap-1">
+                                            <PlusIcon /> Add Attribute
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Stock</label>
+                                            <input type="number" value={newVariant.stock} onChange={(e) => setNewVariant({ ...newVariant, stock: e.target.value })} className={inputCls} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Price (Optional)</label>
+                                            <input type="number" placeholder="Uses base price if empty" value={newVariant.price.amount} onChange={(e) => setNewVariant({ ...newVariant, price: { ...newVariant.price, amount: e.target.value } })} className={inputCls} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Images (Max 7)</label>
+                                        <input type="file" multiple accept="image/*" onChange={handleVariantImageUpload} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-[#c9a96e] file:text-white hover:file:bg-[#a8893e] cursor-pointer" />
+                                        {newVariant.images.length > 0 && (
+                                            <div className="flex gap-2 mt-2">
+                                                {newVariant.images.map((img, i) => (
+                                                    <div key={i} className="relative w-16 h-16 border border-[#e0d6c8]">
+                                                        <img src={img.previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                        <button type="button" onClick={() => handleRemoveVariantImage(i)} className="absolute top-0.5 right-0.5 bg-black/50 text-white rounded-full p-0.5"><TrashIcon /></button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button type="button" onClick={handleAddNewVariant} className="mt-4 bg-[#0a0a0a] text-white px-4 py-2 text-xs uppercase tracking-widest font-bold hover:bg-gray-800 transition-colors">
+                                        Save Variant
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="pt-6">
                         <button type="submit" disabled={isSubmitting} className="w-full flex justify-center py-4 px-4 border border-transparent text-sm font-bold text-[#0a0a0a] bg-[#c9a96e] hover:bg-[#a8893e] focus:outline-none tracking-widest uppercase transition-all duration-300 disabled:opacity-60">
-                            {isSubmitting ? "Creating..." : "Create Product"}
+                            {isSubmitting ? "Creating Product..." : "Create Product"}
                         </button>
                     </div>
                 </form>

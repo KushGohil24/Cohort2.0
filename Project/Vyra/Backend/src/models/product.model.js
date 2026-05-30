@@ -1,48 +1,5 @@
-import mongoose from "mongoose";
-
-const METALS = [
-    'Brass', 'Base Metal', 'Silver', 'Copper', 'Yellow Gold', 'White Gold',
-    'Platinum', 'Rose Gold', 'Stainless Steel', 'Sterling Silver',
-    'Precious Metal', 'Pearl', 'Plastic', 'Bamboo', 'Ceramic', 'Enamel',
-    'Fabric', 'Lac', 'Leather', 'Resin', 'Rubber', 'Shell', 'Wood', 'Mother of Pearl'
-];
-
-const CATEGORIES = [
-    'Necklaces', 'Rings', 'Earrings', 'Bracelets', 'Anklets', 'Bangles',
-    'Pendants', 'Chains', 'Nose Pins', 'Hair Accessories', 'Brooches', 'Sets'
-];
-
-const priceSchema = new mongoose.Schema({
-    amount: {
-        type: Number,
-        required: true
-    },
-    currency: {
-        type: String,
-        enum: ['USD', 'INR'],
-        default: 'INR'
-    }
-}, { _id: false });
-
-const variantSchema = new mongoose.Schema({
-    images: [{
-        url: {
-            type: String,
-            required: true
-        }
-    }],
-    stock: {
-        type: Number,
-        default: 0
-    },
-    attributes: {
-        type: Map,
-        of: String
-    },
-    price: {
-        type: priceSchema
-    }
-}, { _id: true });
+import mongoose from 'mongoose';
+import priceSchema from "./price.schema.js";
 
 const productSchema = new mongoose.Schema({
     title: {
@@ -54,54 +11,65 @@ const productSchema = new mongoose.Schema({
         required: true
     },
     seller: {
-        type: mongoose.Schema.ObjectId,
-        ref: "user",
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
         required: true
     },
-    price: {
-        type: priceSchema,
+    category: { 
+        type: String,
+        enum: ['Necklaces', 'Rings', 'Earrings', 'Bracelets', 'Anklets', 'Bangles', 'Pendants', 'Chains', 'Nose Pins', 'Hair Accessories', 'Brooches', 'Sets'],
         required: true
     },
-    images: [{
-        url: {
-            type: String,
-            required: true
-        },
-        alt: {
-            type: String,
-            required: false
-        }
-    }],
-    category: {
+    metal: { 
         type: String,
-        enum: CATEGORIES,
-        required: false
-    },
-    metal: {
-        type: String,
-        enum: METALS,
-        required: false
+        enum: ['Brass', 'Base Metal', 'Silver', 'Copper', 'Yellow Gold', 'White Gold', 'Platinum', 'Rose Gold', 'Stainless Steel', 'Sterling Silver', 'Precious Metal', 'Pearl', 'Plastic', 'Bamboo', 'Ceramic', 'Enamel', 'Fabric', 'Lac', 'Leather', 'Resin', 'Rubber', 'Shell', 'Wood', 'Mother of Pearl'],
+        required: true
     },
     stock: {
         type: Number,
         default: 0
     },
-    bestseller: {
-        type: Boolean,
-        default: false
+    bestseller: { type: Boolean, default: false },
+    tags: [String],
+    price: {
+        type: priceSchema,
+        required: true
     },
-    tags: {
-        type: [String],
-        default: []
-    },
-    variants: {
-        type: [variantSchema],
-        default: []
-    }
-}, {
-    timestamps: true,
-});
+    images: [
+        {
+            url: {
+                type: String,
+                required: true
+            }
+        }
+    ],
+    variants: [
+        {
+            images: [
+                {
+                    url: {
+                        type: String,
+                        required: true
+                    }
+                }
+            ],
+            stock: {
+                type: Number,
+                default: 0
+            },
+            attributes: {
+                type: Map,
+                of: String
+            },
+            price: {
+                type: priceSchema,
+            }
+        },
 
-export { METALS, CATEGORIES, priceSchema };
-const productModel = mongoose.model("product", productSchema);
+    ]
+}, { timestamps: true })
+
+
+const productModel = mongoose.model('product', productSchema);
+
 export default productModel;

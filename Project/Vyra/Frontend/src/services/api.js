@@ -22,9 +22,10 @@ API.interceptors.request.use(async (config) => {
 API.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response.status === 401) {
+        if (error.response && error.response.status === 401) {
             localStorage.removeItem("token");
-            window.location.href = "/login";
+            // Removed window.location.href = "/login" to prevent infinite redirect loops
+            // during global initial data fetches like getMe and getCart.
         }
         return Promise.reject(error);
     }

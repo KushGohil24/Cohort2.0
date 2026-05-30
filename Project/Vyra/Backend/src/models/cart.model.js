@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { priceSchema } from "./product.model.js";
+import priceSchema from "./price.schema.js";
 const cartSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -16,7 +16,7 @@ const cartSchema = new mongoose.Schema({
             variant: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'product.variants',
-                required: true,
+                required: false,
             },
             quantity: {
                 type: Number,

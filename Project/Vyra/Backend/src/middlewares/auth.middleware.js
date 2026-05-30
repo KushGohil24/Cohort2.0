@@ -28,4 +28,28 @@ const authenticateSeller = async (req, res, next) => {
     }
 }
 
-export { authenticateSeller }
+const authenticateUser = async (req, res, next) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const decodedToken = jwt.verify(token, config.JWT_SECRET);
+        const user = await userModel.findById(decodedToken.id);
+        
+        if (!user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        
+        req.user = user;
+        next();
+    } catch (error) {
+        if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+            return res.status(401).json({ message: "Invalid or expired token" });
+        }
+        console.log("Error in authentication", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export { authenticateSeller, authenticateUser }

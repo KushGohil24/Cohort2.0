@@ -11,12 +11,19 @@ export const AppLayout = ({ children }) => {
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        hideProgressBar
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        closeButton={true}
         toastStyle={{
-          backgroundColor: '#0a0a0a',
-          color: '#faf7f2',
-          fontSize: '13px',
+          fontSize: '14px',
           letterSpacing: '0.5px',
+          fontWeight: '500'
         }}
       />
       <Navbar />
