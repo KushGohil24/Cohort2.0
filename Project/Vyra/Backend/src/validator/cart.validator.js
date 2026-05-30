@@ -21,3 +21,23 @@ export const validateAddToCart = [
         .toInt(),
     validateRequest
 ]
+
+export const validateIncrementCartQuantity = [
+    param("productId")
+        .notEmpty().withMessage("Product ID is required")
+        .isMongoId().withMessage("Product ID is invalid"),
+    param("variantId")
+        .optional()
+        .isMongoId().withMessage("Variant ID is invalid"),
+    validateRequest
+]
+
+export const validateDecrementCartQuantity = [
+    param("productId")
+        .notEmpty().withMessage("Product ID is required")
+        .isMongoId().withMessage("Product ID is invalid"),
+    param("variantId")
+        .optional()
+        .isMongoId().withMessage("Variant ID is invalid"),
+    validateRequest
+]

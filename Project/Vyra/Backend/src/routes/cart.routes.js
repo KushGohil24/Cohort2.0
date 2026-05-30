@@ -1,8 +1,7 @@
 import express from 'express';
 import { authenticateUser } from '../middlewares/auth.middleware.js';
-import { validateAddToCart } from '../validator/cart.validator.js';
+import { validateAddToCart, validateIncrementCartQuantity, validateDecrementCartQuantity } from '../validator/cart.validator.js';
 import cartController from '../controllers/cart.controller.js';
-
 
 const router = express.Router();
 
@@ -33,8 +32,8 @@ router.get("/", authenticateUser, cartController.getCart);
  * @argument productId - ID of the product to update
  * @argument variantId - ID of the variant to update
  */
-router.patch("/quantity/increment/:productId/:variantId", authenticateUser, cartController.incrementCartQuantity);
-router.patch("/quantity/increment/:productId", authenticateUser, cartController.incrementCartQuantity);
+router.patch("/quantity/increment/:productId/:variantId", authenticateUser, validateIncrementCartQuantity, cartController.incrementCartQuantity);
+router.patch("/quantity/increment/:productId", authenticateUser, validateIncrementCartQuantity, cartController.incrementCartQuantity);
 
 /**
  * @route PATCH /api/cart/quantity/decrement/:productId/:variantId
@@ -44,8 +43,8 @@ router.patch("/quantity/increment/:productId", authenticateUser, cartController.
  * @argument productId - ID of the product to update
  * @argument variantId - ID of the variant to update
  */
-router.patch("/quantity/decrement/:productId/:variantId", authenticateUser, cartController.decrementCartQuantity);
-router.patch("/quantity/decrement/:productId", authenticateUser, cartController.decrementCartQuantity);
+router.patch("/quantity/decrement/:productId/:variantId", authenticateUser, validateDecrementCartQuantity, cartController.decrementCartQuantity);
+router.patch("/quantity/decrement/:productId", authenticateUser, validateDecrementCartQuantity, cartController.decrementCartQuantity);
 
 /**
  * @route DELETE /api/cart/remove/:cartItemId

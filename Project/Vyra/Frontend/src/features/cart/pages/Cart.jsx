@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ShopContext } from '../../../context/shopContext'
 import Title from '../../Shared/Components/Title';
 import CartTotal from '../components/CartTotal';
@@ -74,7 +75,9 @@ const Cart = () => {
 
                 {/* Product Details */}
                 <div className='flex-1 min-w-0'>
-                  <p className='text-sm font-medium text-[#333] leading-snug'>{productData.name}</p>
+                  <Link to={`/product/${productData._id}`} className='text-sm font-medium text-[#333] leading-snug hover:text-[#c9a96e] transition-colors'>
+                    {productData.name}
+                  </Link>
                   {productData.metal && (
                     <p className='text-[10px] text-[#aaa] tracking-wider uppercase mt-0.5'>{productData.metal}</p>
                   )}

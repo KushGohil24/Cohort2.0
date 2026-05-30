@@ -18,7 +18,7 @@ export const AppLayout = ({ children }) => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark"
+        theme="colored"
         closeButton={true}
         toastStyle={{
           fontSize: '14px',
