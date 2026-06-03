@@ -61,4 +61,12 @@ router.delete("/remove/:cartItemId", authenticateUser, cartController.removeFrom
  */
 router.delete("/clear", authenticateUser, cartController.clearCart);
 
+/**
+ * @route POST /api/cart/payment/create/order
+ */
+router.post("/payment/create/order", authenticateUser, cartController.createOrderController)
+
+
+router.post("/payment/verify/order", authenticateUser, cartController.verifyOrderController)
+
 export default router;
