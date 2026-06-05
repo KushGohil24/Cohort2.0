@@ -8,7 +8,11 @@ export async function getCartDetails(userId) {
                 user: new mongoose.Types.ObjectId(userId)
             }
         },
-        { $unwind: { path: '$items' } },
+        // Unwind items array, keeping empty carts intact
+        {
+            $unwind: { path: '$items', preserveNullAndEmptyArrays: true }
+        },
+        // Lookup the product details
         {
             $lookup: {
                 from: 'products',
@@ -17,45 +21,78 @@ export async function getCartDetails(userId) {
                 as: 'items.product'
             }
         },
-        { $unwind: { path: '$items.product' } },
+        // Unwind product array, keeping items where product might be missing intact
         {
-            $unwind: { path: '$items.product.variants' }
+            $unwind: { path: '$items.product', preserveNullAndEmptyArrays: true }
         },
+        // Find matching variant
         {
-            $match: {
-                $expr: {
-                    $eq: [
-                        '$items.variant',
-                        '$items.product.variants._id'
-                    ]
+            $addFields: {
+                "items.matchingVariant": {
+                    $filter: {
+                        input: { $ifNull: ['$items.product.variants', []] },
+                        as: 'variant',
+                        cond: { $eq: ['$$variant._id', '$items.variant'] }
+                    }
                 }
             }
         },
         {
             $addFields: {
-                itemPrice: {
-                    price: {
-                        $multiply: [
-                            '$items.quantity',
-                            '$items.product.variants.price.amount'
-                        ]
-                    },
-                    currency:
-                        '$items.product.variants.price.currency'
+                "items.selectedVariant": { $arrayElemAt: ['$items.matchingVariant', 0] }
+            }
+        },
+        // Override price and images with variant ones, fallback to product
+        {
+            $addFields: {
+                "items.price": {
+                    $cond: {
+                        if: { $and: ['$items.selectedVariant', '$items.selectedVariant.price', { $ne: ['$items.selectedVariant.price.amount', null] }] },
+                        then: '$items.selectedVariant.price',
+                        else: '$items.product.price'
+                    }
+                },
+                "items.images": {
+                    $cond: {
+                        if: { $and: ['$items.selectedVariant', { $gt: [{ $size: { $ifNull: ['$items.selectedVariant.images', []] } }, 0] }] },
+                        then: '$items.selectedVariant.images',
+                        else: '$items.product.images'
+                    }
                 }
             }
         },
+        // Group back into a cart object
         {
             $group: {
                 _id: '$_id',
-                totalPrice: { $sum: '$itemPrice.price' },
-                currency: {
-                    $first: '$itemPrice.currency'
+                user: { $first: '$user' },
+                totalPrice: { 
+                    $sum: { 
+                        $multiply: ['$items.quantity', '$items.price.amount'] 
+                    } 
                 },
-                items: { $push: '$items' }
+                currency: {
+                    $first: { $ifNull: ['$items.price.currency', 'INR'] }
+                },
+                items: { 
+                    $push: {
+                        $cond: [
+                            { $not: ['$items.product'] },
+                            '$$REMOVE',
+                            {
+                                product: '$items.product',
+                                variant: '$items.variant',
+                                quantity: '$items.quantity',
+                                price: '$items.price',
+                                images: '$items.images',
+                                _id: '$items._id'
+                            }
+                        ]
+                    }
+                }
             }
         }
-    ]))[ 0 ]
+    ]))[0];
 
-    return cart
+    return cart;
 }

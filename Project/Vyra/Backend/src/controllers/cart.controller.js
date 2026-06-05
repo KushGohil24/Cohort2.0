@@ -103,10 +103,11 @@ const addToCart = async (req, res) => {
 
 const getCart = async (req, res) => {
     const user = req.user;
-    let cart = await cartModel.findOne({ user: user._id }).populate("items.product");
+    let cart = await getCartDetails(user._id);
 
     if(!cart){
-        cart = await cartModel.create({ user: user._id })
+        await cartModel.create({ user: user._id });
+        cart = await getCartDetails(user._id);
     }
 
     return res.status(200).json({
@@ -319,11 +320,11 @@ export const createOrderController = async (req, res) => {
             productId: item.product._id,
             variantId: item.variant,
             quantity: item.quantity,
-            images: item.product.variants.images || item.product.images,
+            images: item.images ? item.images.map(img => img.url) : [], // Map live images to array of strings
             description: item.product.description,
             price: {
-                amount: item.product.variants.price.amount || item.product.price.amount,
-                currency: item.product.variants.price.currency || item.product.price.currency
+                amount: item.price.amount, // Live price populated by getCartDetails
+                currency: item.price.currency
             }
         }))
     })
@@ -331,7 +332,8 @@ export const createOrderController = async (req, res) => {
     return res.status(200).json({
         message: "Order created successfully",
         success: true,
-        order
+        order,
+        keyId: config.RAZORPAY_KEY_ID
     })
 }
 

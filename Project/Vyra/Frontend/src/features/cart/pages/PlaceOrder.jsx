@@ -1,13 +1,58 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import Title from '../../Shared/Components/Title'
 import CartTotal from '../components/CartTotal'
 import { ShopContext } from '../../../context/shopContext'
+import { cartApi } from '../service/cart.api'
+import { toast } from 'react-toastify'
 
 const PlaceOrder = () => {
-  const [method, setMethod] = useState('cod');
   const { navigate } = useContext(ShopContext);
 
   const inputClass = 'vyra-input rounded-none w-full';
+
+  const handlePlaceOrder = async () => {
+      try {
+          const response = await cartApi.createOrder();
+          if (response.data?.success) {
+              const { order, keyId } = response.data;
+              
+              const options = {
+                  key: keyId,
+                  amount: order.amount,
+                  currency: order.currency,
+                  name: "VYRA",
+                  description: "Order Payment",
+                  order_id: order.id,
+                  handler: async (paymentResponse) => {
+                      try {
+                          const verifyRes = await cartApi.verifyOrder({
+                              razorpay_order_id: paymentResponse.razorpay_order_id,
+                              razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                              razorpay_signature: paymentResponse.razorpay_signature
+                          });
+                          if (verifyRes.data?.success) {
+                              toast.success("Payment successful!");
+                              navigate('/orders');
+                          }
+                      } catch (error) {
+                          toast.error("Payment verification failed");
+                          console.error("Payment verification failed", error);
+                      }
+                  },
+                  theme: {
+                      color: "#c9a96e"
+                  }
+              };
+              
+              const rzp = new window.Razorpay(options);
+              rzp.open();
+          }
+      } catch (error) {
+          toast.error(error.response?.data?.message || "Failed to create order");
+          console.error("Failed to create order", error);
+      }
+  };
+
 
   return (
     <div className='flex flex-col sm:flex-row justify-between gap-8 pt-5 sm:pt-14 min-h-[80vh] border-t border-[#e0d6c8]'>
@@ -38,27 +83,9 @@ const PlaceOrder = () => {
         <CartTotal />
 
         <div className='mt-8'>
-          <Title text1={'PAYMENT'} text2={'METHOD'} />
-          <div className='flex gap-3 flex-col mt-4'>
-            {[
-              { id: 'upi', label: 'UPI' },
-              { id: 'card', label: 'CARD' },
-              { id: 'cod', label: 'CASH ON DELIVERY' },
-            ].map(({ id, label }) => (
-              <div
-                key={id}
-                onClick={() => setMethod(id)}
-                className={`flex items-center gap-3 border p-3 px-4 cursor-pointer transition-all ${method === id ? 'border-[#c9a96e] bg-[#c9a96e]/5' : 'border-[#e0d6c8] hover:border-[#c9a96e]'}`}
-              >
-                <span className={`w-3.5 h-3.5 border rounded-full transition-colors flex-shrink-0 ${method === id ? 'bg-[#c9a96e] border-[#c9a96e]' : 'border-[#ccc]'}`} />
-                <p className='text-sm font-medium tracking-wider'>{label}</p>
-              </div>
-            ))}
-          </div>
-
           <button
-            onClick={() => navigate('/orders')}
-            className='w-full mt-6 py-4 bg-[#c9a96e] hover:bg-[#a8893e] text-[#0a0a0a] text-xs font-bold tracking-[3px] uppercase transition-colors duration-300 active:scale-[0.98]'
+            onClick={handlePlaceOrder}
+            className='w-full py-4 bg-[#c9a96e] hover:bg-[#a8893e] text-[#0a0a0a] text-xs font-bold tracking-[3px] uppercase transition-colors duration-300 active:scale-[0.98]'
           >
             Place Order
           </button>
