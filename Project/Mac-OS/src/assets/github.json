@@ -1,0 +1,34 @@
+[
+    {
+        "thumbnail": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=1000",
+        "name": "UDAAN’26 Tech Fest Platform",
+        "description": "Designed and developed a full-stack event management platform serving over 1,600 users and 2,800 registrations. Managed registrations generating Rs.99,240+ in revenue through online and offline payment tracking. Built dashboards for event management, user tracking, and analytics of 950+ participants. Optimized performance and UI for handling high traffic during live event registrations.",
+        "stack": ["React", "Node.js", "Express.js", "MongoDB"],
+        "github": "https://github.com/KushGohil24",
+        "link": "https://bvmtechfest.onrender.com/"
+    },
+    {
+        "thumbnail": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=1000",
+        "name": "SmartFix – Home Services Platform",
+        "description": "Built a full-stack MERN application connecting customers with local home service professionals. Implemented JWT authentication and role-based access control for customer, worker, and admin modules. Implemented booking, worker approval, review, and rating features using MongoDB and Express.js. Designed responsive user interfaces using React, Tailwind CSS, and REST API integration.",
+        "stack": ["React", "Node.js", "Express.js", "MongoDB", "Tailwind CSS"],
+        "github": "https://github.com/KushGohil24/smartfix",
+        "link": null
+    },
+    {
+        "thumbnail": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=1000",
+        "name": "AskBVM – AI College Assistant",
+        "description": "Created frontend components for an AI-powered college assistant chatbot. Built responsive chat UI using HTML, CSS, and JavaScript with mobile support. Explored LangChain, FAISS vector search, and web scraping concepts.",
+        "stack": ["JavaScript", "LangChain", "Ollama", "FAISS"],
+        "github": "https://github.com/KushGohil24",
+        "link": null
+    },
+    {
+        "thumbnail": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=1000",
+        "name": "Forever E-Commerce",
+        "description": "A frontend e-commerce web application built using React and Vite. It leverages React Router for navigation and React Toastify for notifications.",
+        "stack": ["React", "Vite", "JavaScript", "CSS"],
+        "github": "https://github.com/KushGohil24/forever-ecommerce",
+        "link": "https://forever-ecommerce-chi.vercel.app/"
+    }
+]

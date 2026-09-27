@@ -1,0 +1,122 @@
+/**
+ * @file: profile.config.ts
+ * @author: Kush Gohil
+ * @summary: B.Tech Information Technology student & Full-Stack MERN Developer.
+ */
+
+// --------------------------------------------------
+// 1. CORE DEPENDENCIES & SKILLS
+// --------------------------------------------------
+
+const TECH_STACK = {
+  frontend: [
+    "React.js",
+    "JavaScript",
+    "Tailwind CSS",
+    "HTML",
+    "CSS",
+    "GSAP",
+  ],
+  backend: [
+    "Node.js",
+    "Express.js",
+  ],
+  databases: [
+    "MongoDB",
+    "MySQL",
+  ],
+  tools: ["Git", "GitHub", "VS Code", "Postman", "MongoDB Compass"]
+};
+
+// --------------------------------------------------
+// 2. EXPERIENCE LOG (Reverse Chronological)
+// --------------------------------------------------
+
+class ProfessionalHistory {
+  
+  /** * CURRENT ROLE
+   * @period 2026
+   */
+  public async UDAAN26_TechFest(): Promise<Impact> {
+    const role = "Developer Head";
+    
+    // Key Achievements
+    const optimized = await api.optimize({ strategy: "High Traffic Handling" });
+    const scale = "1,600+ users and 2,800+ registrations";
+    const revenue = "Rs.99,240+";
+    
+    const leadership = this.lead(["Website Development", "Technical Operations"]);
+    const features = "Dashboards for event management, user tracking, and analytics";
+    
+    return { role, scale, revenue, leadership, features };
+  }
+
+  /** * PREVIOUS EXPERIENCE
+   * @period Oct. 2023 - Sep. 2025
+   */
+  public TSA_TeamMember(): void {
+    this.role = "Web Development Team Member";
+    this.focus = "Student Web Development Projects";
+    
+    // Contributed to student web development projects
+    // Collaborated with the team on technical initiatives
+  }
+
+  /** * VOLUNTEER
+   * @period Sep. 2024 - Aug. 2025
+   */
+  public GeeksForGeeks_StudentChapter(): void {
+    this.role = "Branch Representative";
+    this.focus = "Community Building";
+    
+    // Organized coding events
+    // Promoted technical learning among students
+  }
+}
+
+// --------------------------------------------------
+// 3. FEATURED PROJECTS
+// --------------------------------------------------
+
+interface ProjectDetails {
+  stack: string[];
+  project: string;
+  description: string;
+}
+
+const trophyCabinet: ProjectDetails[] = [
+  {
+    project: "SmartFix – Home Services Platform",
+    stack: ["React", "Node.js", "Express.js", "MongoDB", "Tailwind CSS"],
+    description: "Built a full-stack MERN application connecting customers with local home service professionals with JWT authentication and RBAC."
+  },
+  {
+    project: "AskBVM – AI College Assistant",
+    stack: ["JavaScript", "LangChain", "Ollama", "FAISS"],
+    description: "AI-powered college assistant chatbot with responsive UI and vector search capabilities."
+  }
+];
+
+// --------------------------------------------------
+// 4. ACADEMIC BACKGROUND
+// --------------------------------------------------
+
+const education = new Map<string, string>([
+  ["Birla Vishvakarma Mahavidyalaya", "B.Tech Information Technology (8.36 CPI)"],
+  ["B.N. Virani Higher Secondary School", "Higher Secondary (Class XII) (71.84%)"],
+  ["Shree Swaminarayan High School", "Secondary (Class X) (88.5%)"]
+]);
+
+export default new ProfessionalHistory();
+
+
+```bash
+# TERMINAL OUTPUT
+# ---------------------------------------
+$ user --status
+> Contact: 951-039-5457 | gohilkush761@gmail.com
+> Profiles: linkedin.com/in/kush | github.com/kush
+> Status: Open to Opportunities
+> Loading Assets... [||||||||||] 100%
+> Ready.
+```
