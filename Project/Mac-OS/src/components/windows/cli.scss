@@ -1,8 +1,29 @@
 .cli-window{
     height: 100%;
     overflow: auto;
+    background: rgba(20, 20, 26, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 
     div[name="react-console-emulator"]{
         height: 100%;
+        scrollbar-width: thin;
+        scrollbar-color: #ffb86c transparent;
+        
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: #ffb86c;
+            border-radius: 4px;
+        }
+
+        /* Thick terminal block cursor */
+        input[name="react-console-emulator__input"] {
+            caret-color: #50fa7b;
+            caret-shape: block; 
+        }
     }
 }
