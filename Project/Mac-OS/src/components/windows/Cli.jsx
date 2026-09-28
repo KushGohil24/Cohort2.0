@@ -50,9 +50,9 @@ const welcomeText = [
   "  echo     - Echo a passed string"
 ];
 
-const Cli = () => {
+const Cli = ({windowName, setWindowsState}) => {
     return (
-        <MacWindow>
+        <MacWindow windowName={windowName} setWindowsState={setWindowsState}>
             <div className="cli-window">
                 <Terminal 
                     commands={commands}

@@ -27,6 +27,13 @@
                 width: 1rem;
                 background-color: #FF5C5F;
                 border-radius: 10px;
+                cursor: default;
+            }
+            .close:hover{
+                background-image: url('../../assets/icons/close.svg');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
             }
             .minimize{
                 height: 1rem;

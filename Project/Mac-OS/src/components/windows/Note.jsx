@@ -4,7 +4,7 @@ import MacWindow from "./MacWindow";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import "./note.scss"
 import { atelierDuneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-const Note = () => {
+const Note = ({windowName, windowsState, setWindowsState}) => {
     const [markdown, setMarkdown] = useState("");
     useEffect(()=>{
         fetch("./note.txt")
@@ -12,7 +12,7 @@ const Note = () => {
         .then(text=> setMarkdown(text))
     }, [])
     return (
-        <MacWindow>
+        <MacWindow windowName={windowName} windowsState={windowsState} setWindowsState={setWindowsState}>
             <div className="note-window" >
                 {
                     markdown ? 

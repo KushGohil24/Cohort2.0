@@ -2,7 +2,7 @@ import React from "react";
 import { Rnd } from "react-rnd"
 import "./macwindow.scss"
 
-const MacWindow = ({ children, width = "60vw" , height = "60vh" }) => {
+const MacWindow = ({ windowName, setWindowsState, children, width = "60vw" , height = "60vh" }) => {
     return (
         <Rnd
             default={{
@@ -15,7 +15,7 @@ const MacWindow = ({ children, width = "60vw" , height = "60vh" }) => {
             <div className="window">
                 <div className="nav">
                     <div className="control-button">
-                        <div className="close"></div>
+                        <div className="close" onClick={()=>setWindowsState((prev)=>({...prev, [windowName]: false}))}></div>
                         <div className="minimize"></div>
                         <div className="maximize"></div>
                     </div>
